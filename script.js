@@ -10,6 +10,8 @@
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const GEOFENCE_METERS = 30;
   const TELEMETRY_INTERVAL = 3000;
+  // Browser-side CARTO Basemaps key. Restrict allowed websites in the CARTO dashboard.
+  const CARTO_BASEMAP_KEY = 'cb1_4m0o_1_7bc2e168d25a26b3ddd79605';
   const CAMPUS_CENTER = [6.6778, -1.5708];
   const COLORS = {
     green: '#168467', blue: '#4778f5', orange: '#ed9347', violet: '#9a6de1',
@@ -157,8 +159,8 @@
 
   function startMap() {
     if (!map) return;
-    streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      subdomains:'abcd', maxZoom:19, maxNativeZoom:19, keepBuffer:3, updateWhenIdle:true, updateWhenZooming:false,
+    streetLayer = L.tileLayer(`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${encodeURIComponent(CARTO_BASEMAP_KEY)}`, {
+      maxZoom:19, maxNativeZoom:19, keepBuffer:3, updateWhenIdle:true, updateWhenZooming:false,
       attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
     });
     streetLayer.on('tileerror', () => {

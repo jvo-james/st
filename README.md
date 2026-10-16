@@ -16,7 +16,7 @@ You can also use the VS Code **Live Server** extension. The map requires an inte
 
 ## Interface updates
 
-- **Light campus basemap:** CARTO Voyager tiles through Leaflet, with map attribution shown on the map. No Google Maps API key or Google Maps billing setup is required for this prototype. The public tile service still has its own usage terms and availability limits; do not assume it is a guaranteed production hosting service.
+- **Light campus basemap:** CARTO Voyager raster tiles through Leaflet. The CARTO Basemaps API key is configured in `script.js`; because browser keys are visible to visitors, restrict the key to your development/deployment hostnames in the CARTO Basemaps dashboard. Keep the OpenStreetMap and CARTO attribution visible. Usage allowances and terms depend on your CARTO account and project type; do not assume this public endpoint is guaranteed production hosting.
 - **Slim, directional shuttle marker:** a narrow top-down SVG with a north-facing base orientation. Its vehicle art rotates along the route bearing, while the ETA bubble stays upright.
 - **Route-to-pickup highlight:** selecting a shuttle opens the ride sheet and highlights its approach to the next checkpoint. When device location is available, the app attempts to request road geometry from the public OSRM demo service to the user's location. The fallback joins the shuttle's route to its next checkpoint and estimates the remaining distance.
 - **Smooth movement:** simulated vehicles move continuously along route geometry, and the heading uses a short look-ahead around corners. When a WebSocket feed is configured, external GPS fixes are interpolated over a short interval rather than applied as abrupt jumps.
