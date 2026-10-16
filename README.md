@@ -1,6 +1,6 @@
 # KNUST Shuttle Tracker
 
-A mobile-first campus shuttle tracking prototype built with HTML, CSS, vanilla JavaScript and Leaflet. It includes a light campus map, slim top-down shuttle markers, smooth route movement, a swipeable ride sheet, checkpoint search and direction-aware trip planning.
+A mobile-first campus shuttle tracking prototype built with HTML, CSS, vanilla JavaScript and Leaflet. It includes a light campus map, slim top-down shuttle markers, smooth route movement, a swipeable ride sheet, checkpoint search and service-direction selection.
 
 ## Run locally
 
@@ -14,7 +14,7 @@ Then open <http://localhost:8000>. VS Code Live Server also works. Location-base
 
 ## Route and checkpoint model
 
-Each shuttle service has a separate ordered outbound pattern and return pattern. The planner evaluates future checkpoint visits in that order instead of treating every bus as suitable merely because it is nearby.
+Each shuttle service has a separate ordered outbound pattern and return pattern. The service selector filters vehicles by the route/direction label printed on the bus instead of asking students to plan a pickup-to-destination trip.
 
 ### Service patterns encoded from the project owner's route information
 
@@ -36,17 +36,21 @@ Each shuttle service has a separate ordered outbound pattern and return pattern.
 
 - Included as a provisional endpoint-only service because public reporting has mentioned a connection between Brunei and Medical Village. The app does **not** claim to know the official intermediate stops, timetable, or final operating pattern.
 
-The sample fleet assigns demo vehicles to these services for interface testing. Bus IDs, positions, occupancy, driver details, route cycle times and all displayed ETAs are mock values, not live operational data.
+**College of Science ↔ Medical Village**
 
-## Route-aware trip planning
+- Included as a provisional endpoint-only pattern based on the service option supplied by the project owner; exact stops and operating details still need confirmation.
 
-Expand the bottom sheet and use **Where are you going?** to choose pickup and destination checkpoints. The app only returns sample vehicles whose configured ordered stop pattern can carry the student from that pickup to that destination in a single service pattern. A nearby vehicle on a route that does not serve the trip is not treated as a valid direct option. If no configured service matches, the app says so rather than inventing a route.
+The sample fleet assigns demo vehicles to these services for interface testing, including a provisional College of Science ↔ Medical Village route. Bus IDs, positions, route cycle times and all displayed ETAs are mock values, not live operational data.
 
-The ETA is a prototype estimate based on a configured service-cycle duration and progress along the route. It is not based on measured campus traffic or a production timetable. Terminal dwell time, queues, driver decisions, temporary diversions and stop-level waiting rules still need field research before operational use.
+## Service selection and route-aware ETA
+
+Expand the bottom sheet and choose the shuttle service/direction label (for example, Commercial Area → KSB or KSB → Commercial Area). The vehicle list filters by service direction, but all bus icons remain visible on the map. Selecting a bus highlights only the part of its configured service route ahead of it. The user location is shown as a blue dot when permission is granted, and no route is drawn from the shuttle to the user.
+
+The ETA is a prototype estimate to the next checkpoint based on progress along the ordered route and a configured service-cycle duration. It is not a guaranteed arrival time and is not based on measured campus traffic or a production timetable. Terminal dwell time, queues, driver decisions, temporary diversions and observed segment travel times still need field research before operational use. No passenger occupancy or seat availability is shown because it is not currently verified.
 
 ## Campus stop coordinates and source confidence
 
-The route order for Commercial Area–KSB and Brunei–KSB comes from the project owner. Stop coordinates are a separate matter: most have not been surveyed to the exact bus bay. A public KNUST campus bus-stop mapping project identifies names including Pentecoste, Casely Hayford, CCB, Steps, KSB, Ahinsan, Brunei and Bomso Gate. Official KNUST materials describe shuttles serving halls/residential areas, academic areas and the commercial area. Public reporting in June 2026 also mentioned a Brunei–Medical Village connection. These references support candidate checkpoint discovery, but they do not confirm the full route sequence, exact boarding position, or live service status.
+The route order for Commercial Area–KSB and Brunei–KSB comes from the project owner. College of Science–Gaza, Brunei–Medical Village and College of Science–Medical Village are provisional patterns pending operator confirmation. Stop coordinates are a separate matter: most have not been surveyed to the exact bus bay. A public KNUST campus bus-stop mapping project identifies names including Pentecoste, Casely Hayford, CCB, Steps, KSB, Ahinsan, Brunei and Bomso Gate. Official KNUST materials describe shuttles serving halls/residential areas, academic areas and the commercial area. Public reporting in June 2026 also mentioned a Brunei–Medical Village connection. These references support candidate checkpoint discovery, but they do not confirm the full route sequence, exact boarding position, or live service status.
 
 - Checkpoints explicitly provided by the project owner are used in the confirmed route patterns.
 - Other named campus stops and places are marked as approximate/candidate pins in the interface.
@@ -96,7 +100,6 @@ A message may be one vehicle record, an array of records, or an object with a `v
   "lng": -1.5708,
   "heading": 90,
   "speed": 18,
-  "occupancy": 8,
   "capacity": 18,
   "timestamp": 1792123456789
 }
@@ -106,7 +109,7 @@ Coordinates are validated client-side. Production deployments also need authenti
 
 ## Main files
 
-- `index.html` — app shell, map container, controls, route planner and swipeable sheet.
+- `index.html` — app shell, map container, controls, service selector and swipeable sheet.
 - `styles.css` — visual design, responsive layout, markers and sheet drag surfaces.
 - `script.js` — stops, directional service patterns, sample shuttle fleet, route/ETA calculations, map layers, animation, search, alerts and optional WebSocket feed.
 - `campus-fallback.svg` — bundled schematic used if Leaflet or online map assets cannot load.

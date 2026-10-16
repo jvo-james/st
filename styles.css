@@ -406,3 +406,16 @@ button:disabled { opacity: .48; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* Route-first selector: students choose the destination printed on a shuttle. */
+.service-select-label { display:flex; flex-direction:column; gap:7px; color:var(--muted); font-size:10px; font-weight:800; }
+.service-select-label select { width:100%; min-height:46px; padding:0 40px 0 13px; border:1px solid #d9e7dd; border-radius:12px; background:#fff; color:var(--ink); font:inherit; font-size:12px; font-weight:800; outline:none; box-shadow:0 2px 8px rgba(20,42,28,.035); }
+.service-select-label select:focus-visible { border-color:var(--green); box-shadow:0 0 0 3px rgba(22,132,103,.14); }
+.service-picker .trip-plan-note { margin:10px 0 0; line-height:1.5; }
+.route-status { background:#eaf7ef !important; color:#176a51 !important; }
+.route-status i { background:#20a875 !important; box-shadow:0 0 0 3px rgba(32,168,117,.13); }
+/* Keep the legacy occupancy/seat widgets out of the interface; live passenger counts aren't available. */
+.occupancy-card, #rideSeatsLeft, #quickVehiclePlate { display:none !important; }
+/* Preserve a clean icon silhouette: no white halo or border around the bus body. */
+.bus-marker-shell, .bus-marker-shell.leaflet-div-icon { border:0 !important; outline:0 !important; background:transparent !important; box-shadow:none !important; }
+.bus-marker .bus-vehicle svg { filter:none !important; }

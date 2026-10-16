@@ -51,7 +51,7 @@
         <div class="sheet-collapsed-summary" id="sheetCollapsedSummary" aria-label="Nearby shuttle summary">
           <span class="summary-live-dot"></span>
           <strong id="shuttleCountSummary">Shuttles nearby</strong>
-          <span class="summary-available" id="seatCountSummary">Checking availability</span>
+          <span class="summary-available" id="seatCountSummary">All services</span>
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="sheet-home" id="sheetHome">
@@ -61,14 +61,10 @@
           </div>
           <div class="next-arrival-line"><span class="arrival-route-swatch" id="nearestRouteSwatch"></span><p id="nearestMessage">Find a shuttle heading to your next stop.</p><button id="nearestBell" class="tiny-bell" type="button" aria-label="Notify me about this checkpoint" title="Notify me about this checkpoint"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
           <div class="sheet-expanded-content" id="homeExpandedContent">
-            <section class="trip-planner" aria-labelledby="tripPlannerTitle">
-              <div class="trip-planner-heading"><div><span class="section-kicker">PLAN A CAMPUS TRIP</span><h3 id="tripPlannerTitle">Where are you going?</h3></div><span class="trip-planner-route-icon" aria-hidden="true">↗</span></div>
-              <div class="trip-fields">
-                <label><span>Pickup stop</span><select id="tripPickup" aria-label="Pickup checkpoint"></select></label>
-                <label><span>Destination</span><select id="tripDestination" aria-label="Destination checkpoint"></select></label>
-              </div>
-              <button class="primary-action full-width trip-plan-button" id="planTrip" type="button">Find suitable shuttles <span aria-hidden="true">→</span></button>
-              <p id="tripPlanNote" class="trip-plan-note">We match the pickup and destination against each shuttle's checkpoint order and direction.</p>
+            <section class="trip-planner service-picker" aria-labelledby="servicePickerTitle">
+              <div class="trip-planner-heading"><div><span class="section-kicker">CHOOSE YOUR SHUTTLE</span><h3 id="servicePickerTitle">Which route do you need?</h3></div><span class="trip-planner-route-icon" aria-hidden="true">↗</span></div>
+              <label class="service-select-label"><span>Shuttle destination label</span><select id="servicePatternSelect" aria-label="Choose shuttle route and direction"><option value="all">All shuttle services</option></select></label>
+              <p id="servicePatternNote" class="trip-plan-note">Choose the destination printed on the bus. Checkpoints and direction are used to estimate its next stop.</p>
             </section>
             <div class="sheet-section-heading"><div><span class="section-kicker">ON THE MOVE</span><h3>Nearby shuttles</h3></div><button id="viewAllBuses" class="text-action" type="button">View all <span>↗</span></button></div>
             <div id="homeBusList" class="home-bus-list"></div>
@@ -87,7 +83,7 @@
               <div class="ride-hero-top">
                 <div class="ride-bus-emblem" id="detailBusIcon"></div>
                 <div class="ride-hero-copy"><span class="ride-eyebrow"><i></i> YOUR SHUTTLE IS ON THE WAY</span><strong id="heroEta">4 min away</strong><span id="heroRouteLabel">Shuttle K-01 · Brunei / Halls</span></div>
-                <span id="seatStatus" class="seat-status"><i></i><span>Seats available</span></span>
+                <span id="seatStatus" class="seat-status route-status"><i></i><span>Route active</span></span>
               </div>
               <div class="pickup-destination">
                 <span class="pickup-pin" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.2" fill="currentColor"/></svg></span>
@@ -97,14 +93,14 @@
               <div class="ride-detail-strip">
                 <div><span>SHUTTLE</span><strong id="detailBusName">Shuttle K-01</strong><span id="detailBusPlate" hidden></span></div>
                 <div><span>LOCATION</span><strong id="busLiveLocation">Locating shuttle…</strong></div>
-                <div><span>SEATS LEFT</span><strong id="rideSeatsLeft">10 available</strong></div>
+                <div><span>SERVICE</span><strong id="detailServiceDirection">Route active</strong></div>
               </div>
               <button id="centerSelected" class="primary-action full-width" type="button">Recenter shuttle <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3m0 15v3m-10.5-10.5h3m15 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
               <div class="ride-feed-note"><span class="bus-live-feed"><i></i><span id="busFeedStatus">Demo route movement</span></span><span id="busEtaToYou">4 min away</span></div>
             </div>
             <div class="bus-detail-extras">
-              <div class="occupancy-card"><div class="occupancy-top"><span>Passenger occupancy</span><strong id="occupancyLabel">8 of 18 seats</strong></div><div class="occupancy-track"><span id="occupancyFill"></span></div><div class="occupancy-foot"><span id="occupancyFootText">10 seats available</span><span id="occupancyPercent">44% full</span><span id="quickVehiclePlate" hidden>AS 2145-24</span></div></div>
-              <div class="driver-card"><div class="driver-avatar" id="driverInitials">KA</div><div class="driver-copy"><span>DRIVER</span><strong id="driverName">Kwame A.</strong><small>Assigned shuttle driver</small></div><div class="vehicle-plate" id="vehiclePlate">AS 2145–24</div></div>
+              
+              <div class="driver-card service-note-card"><div class="driver-avatar">↗</div><div class="driver-copy"><span>SERVICE PATTERN</span><strong id="servicePatternDetail">Ordered campus checkpoints</strong><small>Route direction determines the next stop and ETA.</small></div></div>
               <div class="timeline-heading"><div><span class="section-kicker">UPCOMING</span><h3>Checkpoint timeline</h3></div><span class="route-mini-dot" id="detailRouteDot"></span></div>
               <div class="checkpoint-timeline" id="checkpointTimeline"></div>
             </div>
@@ -119,7 +115,7 @@
       <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </main>
   </div>
-  <div id="helpDialog" class="modal-backdrop" hidden><section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="helpClose" class="dialog-close" type="button" aria-label="Close help">×</button><span class="section-kicker">KNUST SHUTTLE</span><h2 id="helpTitle">Your campus, connected.</h2><p>See all shuttles on the map. Tap any vehicle to highlight its service route and see its checkpoint order, seat availability and estimated pickup time. Allow location access to show your blue position dot. Use Follow shuttle when you want the camera to follow a vehicle; you can always drag or zoom the map yourself.</p><div class="help-key"><span><i class="key-dot available"></i>Seats available</span><span><i class="key-dot full"></i>Full shuttle</span><span><i class="key-user"></i>Your location</span></div><button class="primary-action full-width" id="helpDone" type="button">Got it</button></section></div>
+  <div id="helpDialog" class="modal-backdrop" hidden><section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="helpClose" class="dialog-close" type="button" aria-label="Close help">×</button><span class="section-kicker">KNUST SHUTTLE</span><h2 id="helpTitle">Your campus, connected.</h2><p>See all shuttles on the map. Choose a route label or tap any vehicle to highlight its service route and see its next checkpoint and estimated arrival time. Allow location access to show your blue position dot. Your location is not used to draw a route to you. You can always drag or zoom the map yourself.</p><div class="help-key"><span><i class="key-dot available"></i>Selected shuttle route</span><span class="key-user">Your location</span></div><button class="primary-action full-width" id="helpDone" type="button">Got it</button></section></div>
   <div id="appNotice" class="app-notice" hidden></div>
 
   <script>

@@ -20,18 +20,15 @@
   // Slim top-down vehicle artwork. Its front points north (0deg), matching compass bearings.
   const busSvg = (status = 'available', serviceColor = null) => {
     const color = status === 'full' ? '#a64a4a' : (serviceColor || '#176a51');
-    return `<svg viewBox="0 0 28 58" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M7 7.8C7 4.5 9.1 2.5 12.2 2.5h3.6C18.9 2.5 21 4.5 21 7.8v42.4c0 3.3-2.1 5.3-5.2 5.3h-3.6C9.1 55.5 7 53.5 7 50.2z" fill="${color}"/>
-      <path d="M9.3 10c0-2 1-3.4 3-3.4h3.4c2 0 3 1.4 3 3.4v7.6H9.3z" fill="#bddbd2"/>
-      <path d="M9.4 21h9.2v16H9.4z" fill="#e6efea"/>
-      <path d="M13.95 21.5v15" stroke="#a0b9ad" stroke-width=".9"/>
-      <path d="M10 40h8v7.2c0 1.1-.7 1.8-1.8 1.8h-4.4c-1.1 0-1.8-.7-1.8-1.8z" fill="#113d30"/>
-      <rect x="3.7" y="13" width="3.4" height="8.8" rx="1.4" fill="#1f302b"/>
-      <rect x="20.9" y="13" width="3.4" height="8.8" rx="1.4" fill="#1f302b"/>
-      <rect x="3.7" y="39" width="3.4" height="8.8" rx="1.4" fill="#1f302b"/>
-      <rect x="20.9" y="39" width="3.4" height="8.8" rx="1.4" fill="#1f302b"/>
-      <path d="M10.3 4.8h7.4" stroke="#eafff5" stroke-width="1.2" stroke-linecap="round"/>
-      <rect x="9.4" y="51" width="2.8" height="1.7" rx=".6" fill="#eaffb9"/><rect x="15.8" y="51" width="2.8" height="1.7" rx=".6" fill="#eaffb9"/>
+    return `<svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12.5 2.7h15C32.3 2.7 35 6 35 11.2v37.4c0 5.1-2.5 8.7-7.4 8.7h-15C7.7 57.3 5 53.7 5 48.6V11.2C5 6 7.7 2.7 12.5 2.7Z" fill="${color}" stroke="none"/>
+      <path d="M10.2 11.2c0-2 1.3-3.4 3.2-3.4h13.2c1.9 0 3.2 1.4 3.2 3.4v8.4H10.2v-8.4Z" fill="#14382F"/>
+      <path d="M10.2 22h19.6v14.2H10.2z" fill="#f7fbf6"/>
+      <path d="M12.3 24.3h4.4v4.1h-4.4zM18 24.3h4v4.1h-4zM23.3 24.3h4.3v4.1h-4.3zM12.3 30h4.4v4.1h-4.4zM18 30h4v4.1h-4zM23.3 30h4.3v4.1h-4.3z" fill="${color}" opacity=".38"/>
+      <path d="M10.4 39h19.2m-17.4 4h15.6m-15.6 3.1h15.6" stroke="#11372D" stroke-width="1.5" stroke-linecap="round" opacity=".9"/>
+      <path d="M5.5 15v6m29-6v6M5.5 39v6m29-6v6" stroke="#263D35" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M13 3.8v2.4m14-2.4v2.4" stroke="#f7fff7" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M12.3 52.8h3.2m9 0h3.2" stroke="#e8ffe9" stroke-width="2" stroke-linecap="round"/>
     </svg>`;
   };
   const pinSvg = `<svg viewBox="0 0 32 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 36S3.3 22 3.3 14.8a12.7 12.7 0 1 1 25.4 0C28.7 22 16 36 16 36Z" fill="#fff" stroke="#fff" stroke-width="3"/><path d="M16 34S4.9 21.8 4.9 14.8a11.1 11.1 0 1 1 22.2 0C27.1 21.8 16 34 16 34Z" fill="#2879f6"/><circle cx="16" cy="14.5" r="4.8" fill="#fff"/><circle cx="16" cy="14.5" r="2.1" fill="#2879f6"/></svg>`;
@@ -111,17 +108,23 @@
       id:'bruneiMedical', name:'Brunei ↔ Medical Village', color:COLORS.orange, cycleMs:1080000,
       outboundStopIds:['brunei','medicalVillage'], returnStopIds:['medicalVillage','brunei'],
       outboundDirection:'Towards Medical Village', returnDirection:'Towards Brunei', provisional:true, plannerEnabled:true
+    }),
+    scienceMedical: makeServiceRoute({
+      id:'scienceMedical', name:'College of Science ↔ Medical Village', color:'#d66c9c', cycleMs:1020000,
+      outboundStopIds:['science','medicalVillage'], returnStopIds:['medicalVillage','science'],
+      outboundDirection:'Towards Medical Village', returnDirection:'Towards College of Science', provisional:true, plannerEnabled:true
     })
   };
   // The Brunei–Medical Village endpoint service is included provisionally because campus transport
   // reporting mentions the connection; intermediate stops and exact operating pattern are not confirmed.
   const BUSES = [
-    { id:'K-01', name:'Shuttle K-01', routeId:'bruneiKsb', occupancy:8, capacity:18, offset:.10, driver:'Demo driver', plate:'DEMO 001' },
-    { id:'K-02', name:'Shuttle K-02', routeId:'commercialKsb', occupancy:9, capacity:18, offset:.66, driver:'Demo driver', plate:'DEMO 002' },
-    { id:'K-03', name:'Shuttle K-03', routeId:'commercialKsb', occupancy:12, capacity:20, offset:.30, driver:'Demo driver', plate:'DEMO 003' },
-    { id:'K-04', name:'Shuttle K-04', routeId:'scienceGaza', occupancy:4, capacity:18, offset:.54, driver:'Demo driver', plate:'DEMO 004' },
-    { id:'K-05', name:'Shuttle K-05', routeId:'bruneiKsb', occupancy:6, capacity:18, offset:.72, driver:'Demo driver', plate:'DEMO 005' },
-    { id:'K-06', name:'Shuttle K-06', routeId:'bruneiMedical', occupancy:5, capacity:18, offset:.38, driver:'Demo driver', plate:'DEMO 006' }
+    { id:'K-01', name:'Shuttle K-01', routeId:'bruneiKsb', offset:.10 },
+    { id:'K-02', name:'Shuttle K-02', routeId:'commercialKsb', offset:.66 },
+    { id:'K-03', name:'Shuttle K-03', routeId:'commercialKsb', offset:.30 },
+    { id:'K-04', name:'Shuttle K-04', routeId:'scienceGaza', offset:.54 },
+    { id:'K-05', name:'Shuttle K-05', routeId:'bruneiKsb', offset:.72 },
+    { id:'K-06', name:'Shuttle K-06', routeId:'bruneiMedical', offset:.38 },
+    { id:'K-07', name:'Shuttle K-07', routeId:'scienceMedical', offset:.18 }
   ].map(b => ({ ...b, currentLatLng:null, heading:0, marker:null, trail:null, lastGeoStopIds:new Set(), external:false, telemetryAt:0 }));
 
   const $toast = $('#toast');
@@ -150,6 +153,7 @@
   let plannedTripActive = false;
   let tripPickupId = 'conti';
   let tripDestinationId = 'ksb';
+  let selectedServicePattern = 'all';
   let sheetState = 'collapsed';
   let selectedBusId = null;
   let selectedStopId = null;
@@ -196,13 +200,13 @@
   function distanceLabel(m) { return m < 1000 ? `${Math.max(10,Math.round(m/10)*10)} m away` : `${(m/1000).toFixed(1)} km away`; }
   function etaLabel(minutes) { return minutes <= 1 ? '1 min' : `${Math.round(minutes)} min`; }
   function routeOf(bus) { return ROUTES[bus.routeId]; }
-  function busStatus(bus) { return bus.occupancy >= bus.capacity ? 'full' : 'available'; }
-  function freeSeats(bus) { return Math.max(0,bus.capacity-bus.occupancy); }
+  function busStatus(bus) { return 'available'; }
+  function freeSeats(bus) { return null; }
   function busIconHtml(bus, selected=false) {
-    const status=busStatus(bus),rot=Number.isFinite(bus.heading)?bus.heading:0;
-    const mins=userLatLng?etaFromBusToUser(bus):nextStopInfo(bus).eta;
+    const rot=Number.isFinite(bus.heading)?bus.heading:0;
+    const mins=nextStopInfo(bus).eta;
     const eta=Number.isFinite(mins)?`${Math.max(1,Math.round(mins))} min`:'—';
-    return `<div class="bus-marker${selected?' is-selected':''}" data-bus-marker="${bus.id}" style="--heading:${rot}deg" aria-label="${escapeHtml(bus.name)}, ${status==='full'?'full':`${freeSeats(bus)} seats available`}"><span class="bus-vehicle">${busSvg(status, routeOf(bus).color)}</span><span class="bus-label">${eta}</span><span class="bus-id-label">${bus.id}</span></div>`;
+    return `<div class="bus-marker${selected?' is-selected':''}" data-bus-marker="${bus.id}" style="--heading:${rot}deg" aria-label="${escapeHtml(bus.name)}, ${escapeHtml(routeOf(bus).name)}"><span class="bus-vehicle">${busSvg('available', routeOf(bus).color)}</span><span class="bus-label">${eta}</span><span class="bus-id-label">${bus.id}</span></div>`;
   }
   function stopIconHtml() { return `<div class="stop-pin-marker">${pinSvg}</div>`; }
   function pointIconHtml(place) { return `<div class="map-point-label">${escapeHtml(place.name)}</div>`; }
@@ -356,10 +360,10 @@
       if(prior&&!bus.external){bus.routeTransitionFrom=[prior.lat,prior.lng];bus.routeTransitionHeadingFrom=prior.heading;bus.routeTransitionStart=migrationAt;bus.routeTransitionDuration=900;}
       if(bus.marker)updateBusPosition(bus,migrationAt,true);
     });
-    if(trackingBusId){const tracked=BUSES.find(bus=>bus.id===trackingBusId);if(tracked)updateApproachRoute(tracked,true);}
+    // Rebuild only the highlighted service geometry; never route a shuttle to the user's location.
     if(activeRoute!=='all')focusRoute(activeRoute,false);
     renderHomeBusList();
-    if(plannedTripActive){const selected=BUSES.find(bus=>bus.id===selectedBusId);if(selected)updateApproachRoute(selected,true);}
+    // Route display is independent from the user's location.
   }
   function drawRouteLayers() {
     if(!map) return;
@@ -376,9 +380,26 @@
     const route=ROUTES[routeId];
     const tracked=trackingBusId ? BUSES.find(bus=>bus.id===trackingBusId) : null;
     const visible=!!tracked && tracked.routeId===routeId;
-    if(routeLayers[routeId]) routeLayers[routeId].setStyle({opacity:visible?.18:0,weight:visible?4:0,dashArray:null});
-    if(routeOutlines[routeId]) routeOutlines[routeId].setStyle({opacity:visible?.50:0,weight:visible?8:0});
+    if(routeLayers[routeId]) {
+      const line=visible?directionalRouteGeometry(tracked):[];
+      routeLayers[routeId].setLatLngs(line);
+      routeLayers[routeId].setStyle({opacity:visible?1:0,weight:visible?5:0,dashArray:null});
+    }
+    if(routeOutlines[routeId]) {
+      const line=visible?directionalRouteGeometry(tracked):[];
+      routeOutlines[routeId].setLatLngs(line);
+      routeOutlines[routeId].setStyle({opacity:visible?.95:0,weight:visible?9:0});
+    }
   }
+  function directionalRouteGeometry(bus) {
+    const route=routeOf(bus); if(!route?.geometry?.length)return [];
+    const current=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,performance.now());
+    const direction=currentDirection(bus);
+    const terminal=direction?.key==='outbound'?route.outboundEndMeters:route.totalMeters;
+    const remaining=Math.max(20,terminal-current);
+    return routeSliceForward(route,current,remaining);
+  }
+
   function renderRouteVisibility() {
     Object.keys(ROUTES).forEach(styleRoute);
     if(!map) updateFallbackRouteStyles();
@@ -407,7 +428,7 @@
     });
     BUSES.forEach(bus=>{
       bus.currentLatLng=routePositionAt(routeOf(bus),routeOf(bus).totalMeters*(bus.offset||0));
-      bus.marker=L.marker([bus.currentLatLng.lat,bus.currentLatLng.lng],{icon:busDivIcon(bus,bus.id===selectedBusId),keyboard:true,title:`${bus.name} · ${busStatus(bus)==='full'?'Full':'Seats available'}`,zIndexOffset:bus.id===selectedBusId?1800:1000,riseOnHover:true,autoPanOnFocus:false});
+      bus.marker=L.marker([bus.currentLatLng.lat,bus.currentLatLng.lng],{icon:busDivIcon(bus,bus.id===selectedBusId),keyboard:true,title:`${bus.name} · ${busStatus(bus)==='full'?'Full':'Route active'}`,zIndexOffset:bus.id===selectedBusId?1800:1000,riseOnHover:true,autoPanOnFocus:false});
       bus.marker.on('click',()=>openBusDetail(bus.id)); bus.marker.addTo(map); busMarkers[bus.id]=bus.marker;
     });
     userAccuracyCircle=L.circle(CAMPUS_CENTER,{radius:10,color:'#2879f6',weight:1,opacity:0,fillOpacity:0,interactive:false}).addTo(map);
@@ -420,12 +441,12 @@
     const zoom=map.getZoom();
     // Keep the campus overview clean; secondary landmarks and unverified candidate stops appear only when zoomed in.
     Object.entries(placeMarkers).forEach(([id,marker])=>{
-      marker.setOpacity(zoom >= 15.65 ? 1 : 0);
+      marker.setOpacity(zoom >= 13.25 ? 1 : 0);
       const el=marker.getElement(); if(el) el.style.pointerEvents='none';
     });
     Object.entries(stopMarkers).forEach(([id,marker])=>{
       const stop=STOP_BY_ID.get(id);
-      const threshold=stop?.confidence==='candidate'?16.0:14.35;
+      const threshold=stop?.confidence==='candidate'?14.05:13.0;
       marker.setOpacity(zoom >= threshold ? (stop?.confidence==='candidate'?.72:1) : 0);
     });
   }
@@ -471,112 +492,16 @@
     if(!last||Math.abs(last[0]-finish.lat)>1e-7||Math.abs(last[1]-finish.lng)>1e-7)coords.push([finish.lat,finish.lng]);
     return coords;
   }
-  function pickupTargetFor(bus) {
-    if(plannedTripActive) { const stop=STOP_BY_ID.get(tripPickupId); if(stop)return {lat:stop.lat,lng:stop.lng,name:stop.short,kind:'SELECTED PICKUP',source:'trip',stopId:stop.id}; }
-    if(userLatLng) return {lat:userLatLng.lat,lng:userLatLng.lng,name:'Your current location',kind:'YOUR PICKUP POINT',source:'user'};
-    const next=nextStopInfo(bus);
-    const stop=next?.stop || STOP_BY_ID.get(routeOf(bus).stopIds[0]);
-    return {lat:stop.lat,lng:stop.lng,name:stop.short,kind:'NEXT CHECKPOINT',source:'stop',stopId:stop.id};
-  }
-  function ensureApproachLayers() {
-    if(!map)return;
-    if(!approachOutline)approachOutline=L.polyline([],{color:'#ffffff',weight:10,opacity:.98,interactive:false,lineCap:'round',lineJoin:'round',className:'approach-route-outline'}).addTo(map);
-    if(!approachLine)approachLine=L.polyline([],{color:'#20b982',weight:5.5,opacity:1,interactive:false,lineCap:'round',lineJoin:'round',className:'approach-route-line'}).addTo(map);
-  }
   function clearApproachRoute() {
-    if(map){if(approachLine)map.removeLayer(approachLine);if(approachOutline)map.removeLayer(approachOutline);if(approachTargetMarker)map.removeLayer(approachTargetMarker);}
-    approachLine=null;approachOutline=null;approachTargetMarker=null;approachCoords=[];approachTarget=null;approachDistanceMeters=null;approachRequestAt=0;approachRequestStart=null;approachRequestTarget=null;approachEtaMinutes=null;approachPatternKey='';approachPatternAnchor=null;approachPatternBuildAt=0;
-  }
-  function paintApproachStart(bus,pos,now=performance.now()) {
-    if(!map||trackingBusId!==bus.id||!approachCoords?.length||now-lastApproachPaint<260)return;
-    lastApproachPaint=now;
-    approachCoords[0]=[pos.lat,pos.lng];
-    if(approachLine)approachLine.setLatLngs(approachCoords);
-    if(approachOutline)approachOutline.setLatLngs(approachCoords);
-  }
-  function setApproachGeometry(coords,target,distanceMeters) {
-    if(!map||!coords?.length)return;
-    ensureApproachLayers();
-    approachCoords=coords.filter(pair=>Array.isArray(pair)&&Number.isFinite(pair[0])&&Number.isFinite(pair[1]));
-    approachTarget=target;
-    approachDistanceMeters=Number.isFinite(distanceMeters)?distanceMeters:null;
-    approachOutline.setLatLngs(approachCoords);approachLine.setLatLngs(approachCoords);
-    if(target?.source==='stop'){
-      if(!approachTargetMarker)approachTargetMarker=L.circleMarker([target.lat,target.lng],{radius:6,color:'#ffffff',weight:3,fillColor:'#176a51',fillOpacity:1,interactive:false,className:'pickup-target-marker'}).addTo(map);
-      else approachTargetMarker.setLatLng([target.lat,target.lng]);
-    }else if(approachTargetMarker){map.removeLayer(approachTargetMarker);approachTargetMarker=null;}
-    const bus=BUSES.find(item=>item.id===trackingBusId);
-    if(bus){
-      const fallbackEta=etaFromBusToUser(bus);
-      const minutes=Number.isFinite(approachEtaMinutes)?Math.max(1,Math.round(approachEtaMinutes)):(Number.isFinite(approachDistanceMeters)?Math.max(1,Math.ceil(approachDistanceMeters/250)):(fallbackEta??Math.max(1,Math.round(nextStopInfo(bus).eta))));
-      const etaText=`${minutes} min away`;
-      const etaEl=$('#heroEta');if(etaEl)etaEl.textContent=etaText;
-      const toYou=$('#busEtaToYou');if(toYou)toYou.textContent=etaText;
+    if(map){
+      if(approachLine)map.removeLayer(approachLine);
+      if(approachOutline)map.removeLayer(approachOutline);
+      if(approachTargetMarker)map.removeLayer(approachTargetMarker);
     }
+    approachLine=null;approachOutline=null;approachTargetMarker=null;approachCoords=[];approachTarget=null;
+    approachDistanceMeters=null;approachRequestAt=0;approachRequestStart=null;approachRequestTarget=null;approachEtaMinutes=null;
+    approachPatternKey='';approachPatternAnchor=null;approachPatternBuildAt=0;
   }
-  async function updateApproachRoute(bus,force=false) {
-    if(!bus||trackingBusId!==bus.id)return;
-    const target=pickupTargetFor(bus),p=bus.currentLatLng||currentBusPosition(bus),now=performance.now();
-    if($('#pickupKind'))$('#pickupKind').textContent=target.kind;
-    if($('#pickupTargetName'))$('#pickupTargetName').textContent=target.name;
-    if($('#pickupTargetHelp'))$('#pickupTargetHelp').textContent=target.source==='user'?'Route and ETA update as your shuttle moves':target.source==='trip'?`Pickup ETA · ${STOP_BY_ID.get(tripDestinationId)?.short||tripDestinationId} is downstream`:'Using the next suitable checkpoint on this service';
-    if($('#heroRouteLabel'))$('#heroRouteLabel').textContent=`${bus.name} · ${routeOf(bus).name}`;
-    if(!map){
-      const next=nextStopInfo(bus),route=routeOf(bus),start=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,now);
-      approachCoords=routeSliceForward(route,start,next.distance||0);approachDistanceMeters=next.distance||null;return;
-    }
-    // For an explicit trip, use the next future pickup occurrence whose direction can carry the rider to the destination.
-    // For the default tracking view, draw the route along the current shuttle pattern to its next checkpoint.
-    if(target.source==='stop'||target.source==='trip'){
-      const route=routeOf(bus),start=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,now);
-      const trip=target.source==='trip'?tripEtaInfo(bus):null;
-      const next=target.source==='trip'?trip:nextStopInfo(bus);
-      if(target.source==='trip'&&!trip){
-        if(approachLine)approachLine.setLatLngs([]);if(approachOutline)approachOutline.setLatLngs([]);
-        approachCoords=[];approachDistanceMeters=null;approachEtaMinutes=null;approachRequestAt=now;
-        approachPatternKey=`${bus.id}|trip|${tripPickupId}>${tripDestinationId}|no-match`;
-        const eta=$('#heroEta');if(eta)eta.textContent='Not on this route';const toYou=$('#busEtaToYou');if(toYou)toYou.textContent='Not on this route';
-        return;
-      }
-      const patternKey=`${bus.id}|${target.source}|${target.stopId||''}|${target.source==='trip'?`${tripPickupId}>${tripDestinationId}:${trip.pattern.key}:${trip.nodeIndex}`:'next'}`;
-      const movedSinceBuild=!approachPatternAnchor||haversine(approachPatternAnchor,[p.lat,p.lng])>85;
-      const routeShapeChanged=patternKey!==approachPatternKey;
-      // The moving marker already updates the beginning of the line. Rebuild the whole path only when
-      // its checkpoint/direction changes or the shuttle has advanced far enough to justify new geometry.
-      if(!force&&!routeShapeChanged&&!movedSinceBuild&&now-approachPatternBuildAt<18000){approachRequestAt=now;return;}
-      const coords=routeSliceForward(route,start,next.delta ?? next.distance ?? 0);
-      approachEtaMinutes=next.eta;
-      setApproachGeometry(coords,target,next.delta ?? next.distance ?? haversine([p.lat,p.lng],[target.lat,target.lng])*1.25);
-      approachRequestAt=now;approachPatternKey=patternKey;approachPatternAnchor=[p.lat,p.lng];approachPatternBuildAt=now;
-      return;
-    }
-    const previousTarget=approachRequestTarget;
-    const movedTarget=!previousTarget||haversine(previousTarget,[target.lat,target.lng])>55;
-    const movedBus=!approachRequestStart||haversine(approachRequestStart,[p.lat,p.lng])>55;
-    const shouldFetch=force||!approachCoords.length||movedTarget||(movedBus&&now-approachRequestAt>12000);
-    if(!shouldFetch){if(approachTargetMarker){approachTargetMarker.setLatLng([target.lat,target.lng]);}approachRequestAt=now;return;}
-    approachRequestAt=now;approachRequestStart=[p.lat,p.lng];approachRequestTarget=[target.lat,target.lng];
-    const route=routeOf(bus),start=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,now),next=nextStopInfo(bus);
-    const fallback=()=>{
-      const coords=routeSliceForward(route,start,next.distance||0);
-      const last=coords[coords.length-1];
-      if(last&&haversine(last,[target.lat,target.lng])>2)coords.push([target.lat,target.lng]);
-      const distance=(next.distance||haversine([p.lat,p.lng],last||[target.lat,target.lng]))+haversine(last||[target.lat,target.lng],[target.lat,target.lng]);
-      setApproachGeometry(coords.length>1?coords:[[p.lat,p.lng],[target.lat,target.lng]],target,distance*1.15);
-    };
-    try{
-      const url=`https://router.project-osrm.org/route/v1/driving/${p.lng},${p.lat};${target.lng},${target.lat}?overview=full&geometries=geojson&steps=false`;
-      const response=await fetch(url,{mode:'cors',signal:AbortSignal.timeout?AbortSignal.timeout(8000):undefined});
-      if(!response.ok)throw new Error('Route service unavailable');
-      const data=await response.json();
-      if(data.code!=='Ok'||!data.routes?.[0]?.geometry?.coordinates?.length)throw new Error('No route geometry');
-      // Ignore a late response for a vehicle which is no longer selected.
-      if(trackingBusId!==bus.id)return;
-      const coords=data.routes[0].geometry.coordinates.map(([lng,lat])=>[lat,lng]);
-      setApproachGeometry(coords,target,Number(data.routes[0].distance)||haversine([p.lat,p.lng],[target.lat,target.lng])*1.3);
-    }catch(e){if(trackingBusId===bus.id)fallback();}
-  }
-
   function busDistance(bus, now=performance.now()) {
     const route=routeOf(bus), elapsed=(now-(bus.startedAt ??= now));
     return (((elapsed+bus.offset*route.cycleMs)%route.cycleMs)/route.cycleMs)*(route.totalMeters||1);
@@ -654,12 +579,19 @@
   }
   function updateBusPosition(bus, now=performance.now(), force=false) {
     const pos=currentBusPosition(bus,now);
-    bus.currentLatLng={lat:pos.lat,lng:pos.lng}; bus.heading=pos.heading;
+    bus.currentLatLng={lat:pos.lat,lng:pos.lng};
+    const targetHeading=((pos.heading%360)+360)%360;
+    if(!Number.isFinite(bus.displayHeading)) bus.displayHeading=targetHeading;
+    const headingDelta=((targetHeading-bus.displayHeading+540)%360)-180;
+    const headingAlpha=1-Math.exp(-Math.max(0,now-(bus.lastRenderAt||now))/210);
+    bus.displayHeading=((bus.displayHeading+headingDelta*headingAlpha)%360+360)%360;
+    bus.lastRenderAt=now; bus.heading=bus.displayHeading;
+    const smoothPos={...pos,heading:bus.displayHeading};
     if(!bus.marker){
-      if(!map && fallbackProject){const node=fallbackBusNodes[bus.id];if(node){const display=clusteredFallbackPoint(bus,pos,now);node.setAttribute('transform',`translate(${display.x} ${display.y}) rotate(${pos.heading}) scale(${fallbackBusScale()})`);node.setAttribute('opacity','1');node.style.pointerEvents='auto';}}
+      if(!map && fallbackProject){const node=fallbackBusNodes[bus.id];if(node){const display=clusteredFallbackPoint(bus,smoothPos,now);node.setAttribute('transform',`translate(${display.x} ${display.y}) rotate(${bus.displayHeading}) scale(${fallbackBusScale()})`);node.setAttribute('opacity','1');node.style.pointerEvents='auto';}}
       return;
     }
-    bus.marker.setLatLng(clusteredMapMarkerPosition(bus,pos,now));
+    bus.marker.setLatLng(clusteredMapMarkerPosition(bus,smoothPos,now));
     const selected=bus.id===selectedBusId, status=busStatus(bus);
     if(bus.renderedStatus!==status || bus.renderedSelected!==selected){
       bus.marker.setIcon(busDivIcon(bus,selected));bus.renderedStatus=status;bus.renderedSelected=selected;
@@ -669,17 +601,17 @@
     if(el){
       const inner=el.querySelector('.bus-marker');
       if(inner){
-        inner.style.setProperty('--heading',`${pos.heading}deg`);
+        inner.style.setProperty('--heading',`${bus.displayHeading}deg`);
         inner.classList.toggle('is-selected',selected);
         // Keep moving the SVG every frame, but refresh its ETA text only twice a second.
         if(!bus.labelUpdateAt||now-bus.labelUpdateAt>1800){
           const label=inner.querySelector('.bus-label');
-          if(label){const mins=trackingBusId===bus.id&&plannedTripActive?(tripEtaInfo(bus)?.eta):(userLatLng?etaFromBusToUser(bus):nextStopInfo(bus,now).eta);label.textContent=Number.isFinite(mins)?`${Math.max(1,Math.round(mins))} min`:'—';}
+          if(label){const mins=nextStopInfo(bus,now).eta;label.textContent=Number.isFinite(mins)?`${Math.max(1,Math.round(mins))} min`:'—';}
           bus.labelUpdateAt=now;
         }
       }
     }
-    if(trackingBusId===bus.id) paintApproachStart(bus,pos,now);
+    // Deliberately do not draw any line from this vehicle to the user's location.
     // Keep every vehicle visible while tracking; selection changes stacking/highlight, not visibility.
     bus.marker.setOpacity(1);
     if(el) el.style.pointerEvents='auto';
@@ -759,48 +691,43 @@
   function renderHomeBusList() {
     const list=$('#homeBusList');
     if(!list) return;
-    let ordered, configuredTripMatches=[];
-    if(plannedTripActive) {
-      configuredTripMatches=BUSES.map(bus=>({bus,trip:tripEtaInfo(bus)})).filter(x=>x.trip);
-      ordered=configuredTripMatches.filter(x=>busStatus(x.bus)!=='full').sort((a,b)=>a.trip.eta-b.trip.eta).map(x=>x.bus);
-    } else {
-      ordered=[...BUSES].sort((a,b)=>etaToStop(a,nearestStop()?.id)-etaToStop(b,nearestStop()?.id));
-    }
+    const ordered=(selectedServicePattern==='all'?BUSES.slice():getVisibleBuses()).sort((a,b)=>nextStopInfo(a).eta-nextStopInfo(b).eta);
     list.innerHTML=ordered.length?ordered.map(bus=>{
-      const route=routeOf(bus),next=nextStopInfo(bus),trip=plannedTripActive?tripEtaInfo(bus):null;
-      const eta=trip?trip.eta:etaToStop(bus,nearestStop()?.id);
-      const direction=trip?trip.pattern.label:(currentDirection(bus)?.label||'');
-      const provisional=route.provisional?' · provisional route':'', seats=busStatus(bus)==='full'?'Full':'Seats available';
+      const route=routeOf(bus),next=nextStopInfo(bus),direction=currentDirection(bus)?.label||'';
+      const provisional=route.provisional?' · route pattern to confirm':'';
       return `<button class="home-bus-card" type="button" data-open-bus="${bus.id}">
-        <span class="mini-bus-icon">${busSvg(busStatus(bus), routeOf(bus).color)}</span><span class="home-bus-main"><strong>${escapeHtml(bus.name)}</strong><span>${escapeHtml(route.name)} · ${escapeHtml(direction)} · ${seats}${provisional}</span></span><span class="home-bus-eta"><strong>${Number.isFinite(eta)?etaLabel(eta):(next?etaLabel(next.eta):'—')}</strong><span>${trip?'pickup ETA':Number.isFinite(eta)?'to checkpoint':'next stop'}</span></span>
+        <span class="mini-bus-icon">${busSvg('available',route.color)}</span><span class="home-bus-main"><strong>${escapeHtml(bus.name)}</strong><span>${escapeHtml(route.name)} · ${escapeHtml(direction)}${provisional}</span></span><span class="home-bus-eta"><strong>${Number.isFinite(next.eta)?etaLabel(next.eta):'—'}</strong><span>next checkpoint</span></span>
       </button>`;
-    }).join(''):`<div class="search-empty trip-empty">${plannedTripActive?(configuredTripMatches.length?`A configured service connects ${escapeHtml(STOP_BY_ID.get(tripPickupId)?.short||tripPickupId)} and ${escapeHtml(STOP_BY_ID.get(tripDestinationId)?.short||tripDestinationId)}, but its demo shuttles are currently full.`:`No configured shuttle service currently matches ${escapeHtml(STOP_BY_ID.get(tripPickupId)?.short||tripPickupId)} → ${escapeHtml(STOP_BY_ID.get(tripDestinationId)?.short||tripDestinationId)}. Some campus checkpoints still need confirmed service patterns.`):'No shuttles are available right now.'}</div>`;
+    }).join(''):`<div class="search-empty trip-empty">No demo shuttle is currently travelling in this direction. All vehicles remain visible on the map.</div>`;
     list.querySelectorAll('[data-open-bus]').forEach(btn=>btn.addEventListener('click',()=>openBusDetail(btn.dataset.openBus)));
     $('#mapActivity').textContent=`${BUSES.length} shuttles on the map`;
-    if($('#shuttleCountSummary')) $('#shuttleCountSummary').textContent=plannedTripActive?`${ordered.length} suitable shuttle${ordered.length===1?'':'s'}`:`${BUSES.length} shuttles on the map`;
-    if($('#seatCountSummary')) $('#seatCountSummary').textContent=plannedTripActive?`${tripPickupId==='gaza'?'Gaza trip':'trip matches'}`:`${BUSES.filter(b=>busStatus(b)!=='full').length} with seats`;
+    if($('#shuttleCountSummary')) $('#shuttleCountSummary').textContent=selectedServicePattern==='all'?`${BUSES.length} shuttles on the map`:`${ordered.length} matching shuttles`;
+    if($('#seatCountSummary')) $('#seatCountSummary').textContent=selectedServicePattern==='all'?'All services':`${ordered.length} matching`;
   }
 
   function initTripPlanner() {
-    const pickup=$('#tripPickup'), destination=$('#tripDestination'), button=$('#planTrip');
-    if(!pickup||!destination||!button) return;
-    const options=STOPS.map(stop=>`<option value="${stop.id}">${escapeHtml(stop.short)}${stop.coordinateApproximate?' · approximate pin':''}</option>`).join('');
-    pickup.innerHTML=options; destination.innerHTML=options;
-    pickup.value=tripPickupId; destination.value=tripDestinationId;
-    button.addEventListener('click',()=>{
-      tripPickupId=pickup.value;tripDestinationId=destination.value;
-      if(tripPickupId===tripDestinationId){showToast('Choose two different checkpoints.');return;}
-      plannedTripActive=true;
-      const allMatches=BUSES.map(bus=>({bus,trip:tripEtaInfo(bus)})).filter(x=>x.trip).sort((a,b)=>a.trip.eta-b.trip.eta);
-      const matches=allMatches.filter(x=>busStatus(x.bus)!=='full');
-      $('#tripPlanNote').textContent=matches.length?`${matches.length} seat-available demo shuttle${matches.length===1?'':'s'} matched. ETAs follow checkpoint order and direction.`:allMatches.length?'The route pattern matches, but all matching demo shuttles are currently full.':'No configured service matches this trip yet. Provisional campus stops need confirmed routes.';
-      renderHomeBusList();setSheetState('expanded');
-      if(matches.length) openBusDetail(matches[0].bus.id);
-      else { trackingBusId=null;followSelectedBus=false;clearApproachRoute();renderRouteVisibility(); }
+    const select=$('#servicePatternSelect');
+    if(!select) return;
+    const options=['<option value="all">All shuttle services</option>'];
+    Object.values(ROUTES).forEach(route=>{
+      options.push(`<option value="${route.id}:outbound">${escapeHtml(STOP_BY_ID.get(route.outboundStopIds[0])?.short||route.outboundDirection||'Outbound')} → ${escapeHtml(STOP_BY_ID.get(route.outboundStopIds.at(-1))?.short||'Destination')}${route.provisional?' · route to confirm':''}</option>`);
+      options.push(`<option value="${route.id}:return">${escapeHtml(STOP_BY_ID.get(route.returnStopIds[0])?.short||route.returnDirection||'Return')} → ${escapeHtml(STOP_BY_ID.get(route.returnStopIds.at(-1))?.short||'Origin')}${route.provisional?' · route to confirm':''}</option>`);
     });
-    pickup.addEventListener('change',()=>{tripPickupId=pickup.value;});
-    destination.addEventListener('change',()=>{tripDestinationId=destination.value;});
+    select.innerHTML=options.join(''); select.value=selectedServicePattern;
+    select.addEventListener('change',()=>{
+      selectedServicePattern=select.value;
+      const matches=getVisibleBuses();
+      $('#servicePatternNote').textContent=selectedServicePattern==='all'?'All shuttles remain visible on the map. Tap a vehicle to highlight its service route and see the next checkpoint ETA.':matches.length?`${matches.length} shuttle${matches.length===1?'':'s'} currently travelling in this route direction. ETA follows the ordered checkpoints.`:'No demo shuttle is currently travelling in this direction. All vehicles remain visible on the map.';
+      renderHomeBusList();
+      if($('#shuttleCountSummary')) $('#shuttleCountSummary').textContent=selectedServicePattern==='all'?`${BUSES.length} shuttles on the map`:`${matches.length} matching shuttles`;
+    });
   }
+  function getVisibleBuses() {
+    if(!selectedServicePattern||selectedServicePattern==='all') return BUSES.slice();
+    const [routeId,patternKey]=selectedServicePattern.split(':');
+    return BUSES.filter(bus=>bus.routeId===routeId && currentDirection(bus)?.key===patternKey);
+  }
+
   function renderQuickCheckpoints() {
     $('#quickCheckpoints').innerHTML=STOPS.map(stop=>`<button type="button" class="quick-checkpoint" data-open-stop="${stop.id}">${escapeHtml(stop.short)}</button>`).join('');
     $$('#quickCheckpoints [data-open-stop]').forEach(btn=>btn.addEventListener('click',()=>openStopDetail(btn.dataset.openStop)));
@@ -812,7 +739,7 @@
     STOPS.filter(stop=>stop.confidence!=='candidate').forEach(stop=>{const d=haversine(from,[stop.lat,stop.lng]);if(d<dist){dist=d;nearest=stop;}});
     lastNearestId=nearest.id;
     if($('#shuttleCountSummary')) $('#shuttleCountSummary').textContent=`${BUSES.length} shuttles on the map`;
-    if($('#seatCountSummary')) $('#seatCountSummary').textContent=`${BUSES.filter(b=>busStatus(b)!=='full').length} with seats`;
+    if($('#seatCountSummary')) $('#seatCountSummary').textContent=selectedServicePattern==='all'?'All services':`${getVisibleBuses().length} matching`;
     $('#nearestStopName').textContent=nearest.short;
     $('#nearestDistance').textContent=userLatLng?distanceLabel(dist):'Campus centre · enable location for a closer match';
     const candidates=BUSES.map(bus=>({bus,eta:etaToStop(bus,nearest.id)})).filter(x=>Number.isFinite(x.eta)).sort((a,b)=>a.eta-b.eta);
@@ -910,7 +837,7 @@
     updateSelectionVisuals();renderBusDetail();
     setSheetState('detail');
     Object.keys(ROUTES).forEach(styleRoute);
-    updateApproachRoute(bus,true);
+    clearApproachRoute();
     focusTrackedVehicles(true);lastTrackMapTick=performance.now();
   }
   function nearestMappedPlace(lat,lng) {
@@ -919,48 +846,28 @@
     all.forEach(item=>{const d=haversine([lat,lng],[item.lat,item.lng]);if(d<dBest){dBest=d;best=item;}});
     return {name:best.name,distance:dBest};
   }
-  function etaFromBusToUser(bus) {
-    if(!userLatLng)return null;
-    const pos=bus.currentLatLng||currentBusPosition(bus);
-    const direct=haversine([pos.lat,pos.lng],[userLatLng.lat,userLatLng.lng])*1.28;
-    let remaining=direct;
-    if(trackingBusId===bus.id&&Number.isFinite(approachDistanceMeters)&&approachRequestStart){
-      const travelled=haversine(approachRequestStart,[pos.lat,pos.lng]);
-      remaining=Math.max(direct,approachDistanceMeters-travelled);
-    }
-    return Math.max(1,Math.ceil(remaining/250));
-  }
 
   function renderBusDetail() {
     const bus=BUSES.find(b=>b.id===selectedBusId);if(!bus)return;
-    const route=routeOf(bus),status=busStatus(bus),free=freeSeats(bus),next=nextStopInfo(bus),direction=currentDirection(bus),trip=plannedTripActive?tripEtaInfo(bus):null;
+    const route=routeOf(bus),status=busStatus(bus),next=nextStopInfo(bus),direction=currentDirection(bus);
     $('#detailBusIcon').innerHTML=busSvg(status, routeOf(bus).color);
-    $('#detailBusName').textContent=bus.name;$('#detailBusPlate').textContent=bus.plate;
-    $('#quickVehiclePlate').textContent=bus.plate;
+    $('#detailBusName').textContent=bus.name;
     const pos=bus.currentLatLng||currentBusPosition(bus),near=nearestMappedPlace(pos.lat,pos.lng);
     $('#busLiveLocation').textContent=near.distance<500?`Near ${near.name}`:`Around ${near.name}`;
-    const userEta=etaFromBusToUser(bus);
-    const eta=trip?trip.eta:(userEta===null?next.eta:userEta);
+    const eta=next.eta;
     const etaText=`${Math.max(1,Math.round(eta))} min away`;
     $('#busEtaToYou').textContent=etaText;
     if($('#heroEta'))$('#heroEta').textContent=etaText;
     if($('#heroRouteLabel'))$('#heroRouteLabel').textContent=`${bus.name} · ${route.name}${direction?.label?' · '+direction.label:''}`;
-    const pickupStop=plannedTripActive?STOP_BY_ID.get(tripPickupId):null;
-    if($('#pickupKind'))$('#pickupKind').textContent=plannedTripActive?'SELECTED PICKUP':(userLatLng?'YOUR PICKUP POINT':'NEXT CHECKPOINT');
-    if($('#pickupTargetName'))$('#pickupTargetName').textContent=plannedTripActive?(pickupStop?.short||'Selected pickup'):(userLatLng?'Your current location':(next.stop?.short||'Next checkpoint'));
-    if($('#pickupTargetHelp'))$('#pickupTargetHelp').textContent=plannedTripActive?(trip?`Going to ${STOP_BY_ID.get(tripDestinationId)?.short||tripDestinationId} · direction-aware pickup ETA`:'This service does not serve your selected trip'):(userLatLng?'Route and ETA update as your shuttle moves':'Allow location access to estimate arrival to you');
+    if($('#pickupKind'))$('#pickupKind').textContent='NEXT CHECKPOINT';
+    if($('#pickupTargetName'))$('#pickupTargetName').textContent=next.stop?.short||'Next checkpoint';
+    if($('#pickupTargetHelp'))$('#pickupTargetHelp').textContent='ETA follows this shuttle’s checkpoint order and direction, not straight-line distance.';
     $('#busFeedStatus').textContent=bus.external&&Date.now()-bus.telemetryAt<12000?'Location connected':'Demo route movement';
     $('#centerSelected').innerHTML=((followSelectedBus&&trackingBusId===bus.id)?'Following shuttle':'Follow shuttle')+' <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3m0 15v3m-10.5-10.5h3m15 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
     $('#centerSelected').classList.toggle('is-active',trackingBusId===bus.id&&followSelectedBus);
-    $('#seatStatus').classList.toggle('is-full',status==='full');
-    $('#seatStatus').innerHTML=`<i></i><span>${status==='full'?'Full shuttle':'Seats available'}</span>`;
-    $('#occupancyLabel').textContent=`${bus.occupancy} of ${bus.capacity} seats`;
-    $('#occupancyFill').style.width=`${Math.min(100,bus.occupancy/bus.capacity*100)}%`;
-    $('#occupancyFill').classList.toggle('is-full',status==='full');
-    $('#occupancyFootText').textContent=status==='full'?'No seats available':`${free} ${free===1?'seat':'seats'} available`;
-    if($('#rideSeatsLeft'))$('#rideSeatsLeft').textContent=status==='full'?'Full':`${free} available`;
-    $('#occupancyPercent').textContent=`${Math.round(bus.occupancy/bus.capacity*100)}% full`;
-    $('#driverName').textContent=bus.driver;$('#driverInitials').textContent=bus.driver.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();$('#vehiclePlate').textContent=bus.plate;
+    if($('#seatStatus')) { $('#seatStatus').classList.remove('is-full'); $('#seatStatus').innerHTML='<i></i><span>Route active</span>'; }
+    if($('#detailServiceDirection')) $('#detailServiceDirection').textContent=direction?.label||'Service route';
+    if($('#servicePatternDetail')) $('#servicePatternDetail').textContent=route.name;
     $('#detailRouteDot').style.background=route.color;
     $('#checkpointTimeline').innerHTML=nextStopsFor(bus,6).map((item,i)=>`<div class="timeline-stop ${i===0?'is-next':''} ${i>0?'is-upcoming':''}"><span class="timeline-node">${i===0?'•':''}</span><span class="timeline-stop-copy"><strong>${escapeHtml(item.stop.short)}</strong><small>${i===0?'Next checkpoint':route.name}</small></span><span class="timeline-time">${etaLabel(item.eta)}</span></div>`).join('');
     $('#mapActivity').textContent=`${BUSES.length} shuttles on the move`;
@@ -985,7 +892,7 @@
     const stop=STOP_BY_ID.get(selectedStopId);if(!stop)return;
     const arrivals=BUSES.map(bus=>({bus,eta:etaToStop(bus,stop.id)})).filter(x=>Number.isFinite(x.eta)).sort((a,b)=>a.eta-b.eta);
     $('#stopArrivalCount').textContent=arrivals.length?`${arrivals.length} shuttle${arrivals.length===1?'':'s'} on this route`:'No scheduled shuttles';
-    $('#stopArrivalsList').innerHTML=arrivals.length?arrivals.slice(0,4).map(({bus,eta})=>`<button class="stop-arrival-card" type="button" data-open-bus="${bus.id}"><span class="mini-bus-icon">${busSvg(busStatus(bus), routeOf(bus).color)}</span><span class="stop-arrival-main"><strong>${escapeHtml(bus.name)} · ${escapeHtml(routeOf(bus).name)}</strong><small>${busStatus(bus)==='full'?'Full shuttle':`${freeSeats(bus)} seats available`}</small></span><span class="arrival-badge ${busStatus(bus)==='full'?'is-full':''}">${etaLabel(eta)}</span></button>`).join(''):'<div class="search-empty">No shuttle currently follows this checkpoint. Try another route.</div>';
+    $('#stopArrivalsList').innerHTML=arrivals.length?arrivals.slice(0,4).map(({bus,eta})=>`<button class="stop-arrival-card" type="button" data-open-bus="${bus.id}"><span class="mini-bus-icon">${busSvg(busStatus(bus), routeOf(bus).color)}</span><span class="stop-arrival-main"><strong>${escapeHtml(bus.name)} · ${escapeHtml(routeOf(bus).name)}</strong><small>${escapeHtml(currentDirection(bus)?.label||'Service route')} · next checkpoint ETA</small></span><span class="arrival-badge">${etaLabel(eta)}</span></button>`).join(''):'<div class="search-empty">No shuttle currently follows this checkpoint. Try another route.</div>';
     $$('#stopArrivalsList [data-open-bus]').forEach(btn=>btn.addEventListener('click',()=>openBusDetail(btn.dataset.openBus)));
     $('#stopAlertButton').classList.toggle('is-active',alerts.has(stop.id));$('#stopAlertButton').querySelector('span').textContent=alerts.has(stop.id)?'Alert on':'Alert me';
   }
@@ -1105,7 +1012,7 @@
     userMarker.setLatLng([lat,lng]);userMarker.setOpacity(1);
     userAccuracyCircle.setLatLng([lat,lng]);userAccuracyCircle.setRadius(Math.min(Math.max(accuracy||20,15),180));userAccuracyCircle.setStyle({color:'#2879f6',weight:1,opacity:.45,fillColor:'#2879f6',fillOpacity:.07});
     findNearestStop();
-    if(trackingBusId){const tracked=BUSES.find(b=>b.id===trackingBusId);if(tracked)updateApproachRoute(tracked,false);}
+    // Location updates only move the user's blue dot; they never create a shuttle-to-user route.
     if(followingUser)map.panTo([lat,lng],{animate:true,duration:.35});
   }
   function requestLocation(follow=false, quiet=false) {
@@ -1116,8 +1023,10 @@
     navigator.geolocation.getCurrentPosition(pos=>{
       const firstFix = !userLatLng;
       updateLocation(pos.coords.latitude,pos.coords.longitude,pos.coords.accuracy);
-      if(map && (follow || (quiet && firstFix)))map.setView([pos.coords.latitude,pos.coords.longitude],16,{animate:true});
-      else if(!map && fallbackSvg && (follow || (quiet && firstFix)))focusFallbackAt(pos.coords.latitude,pos.coords.longitude,360);
+      // Acquire and display the user's position on startup without snapping the map camera.
+      // Only an explicit Find me action recentres the map.
+      if(map && follow)map.setView([pos.coords.latitude,pos.coords.longitude],16,{animate:true});
+      else if(!map && fallbackSvg && follow)focusFallbackAt(pos.coords.latitude,pos.coords.longitude,360);
       if(!quiet)showToast('Your location is on the map.');
       if(geolocationWatch===null){geolocationWatch=navigator.geolocation.watchPosition(p=>updateLocation(p.coords.latitude,p.coords.longitude,p.coords.accuracy),()=>{}, {enableHighAccuracy:true,maximumAge:4000,timeout:12000});}
       locateButtons.forEach(b=>b.classList.remove('is-active'));
@@ -1130,7 +1039,7 @@
     const bus=BUSES.find(b=>b.id===selectedBusId);if(!bus)return;
     trackingBusId=bus.id;routeVisibility=true;followSelectedBus=true;
     Object.keys(ROUTES).forEach(styleRoute);updateSelectionVisuals();
-    updateApproachRoute(bus,true);focusTrackedVehicles(true);lastTrackMapTick=performance.now();lastFollowPanAt=performance.now();
+    clearApproachRoute();focusTrackedVehicles(true);lastTrackMapTick=performance.now();lastFollowPanAt=performance.now();
     renderBusDetail();setSheetState('detail');
     showToast(`Following ${bus.name}`);
   }
@@ -1138,15 +1047,16 @@
   function focusTrackedVehicles(animate=false) {
     if(!trackingBusId)return;
     const bus=BUSES.find(item=>item.id===trackingBusId);if(!bus)return;
-    const p=bus.currentLatLng||currentBusPosition(bus), target=pickupTargetFor(bus);
+    const p=bus.currentLatLng||currentBusPosition(bus), routePoints=directionalRouteGeometry(bus);
     if(map){
-      // Keep the selected route in view without zooming so tightly that the rest of the fleet disappears.
-      const points=[[p.lat,p.lng],[target.lat,target.lng],...BUSES.filter(other=>other.currentLatLng).map(other=>[other.currentLatLng.lat,other.currentLatLng.lng])];
-      if(points.every(pair=>pair.every(Number.isFinite))){
-        map.fitBounds(L.latLngBounds(points),{paddingTopLeft:[30,58],paddingBottomRight:[30,window.innerWidth<=760?Math.min(320,window.innerHeight*.38):72],maxZoom:window.innerWidth<=760?15.7:16.2,animate,duration:.48});
-      } else map.setView([p.lat,p.lng],Math.min(map.getZoom(),15.7),{animate});
-    }else if(fallbackSvg){fitFallbackToPoints([[p.lat,p.lng],[target.lat,target.lng],...BUSES.filter(other=>other.currentLatLng).map(other=>[other.currentLatLng.lat,other.currentLatLng.lng])]);}
+      // Frame the route this bus is actually travelling, not the user location or the entire fleet.
+      const points=(routePoints.length?routePoints:[[p.lat,p.lng]]).map(pair=>Array.isArray(pair)?pair:[pair.lat,pair.lng]);
+      if(points.length>1){
+        map.fitBounds(L.latLngBounds(points),{paddingTopLeft:[42,64],paddingBottomRight:[42,window.innerWidth<=760?Math.min(290,window.innerHeight*.36):80],maxZoom:window.innerWidth<=760?15.4:16.0,animate,duration:.5});
+      } else map.setView([p.lat,p.lng],Math.min(map.getZoom(),15.4),{animate,duration:.5});
+    }else if(fallbackSvg){fitFallbackToPoints(routePoints.length?routePoints:[[p.lat,p.lng]]);}
   }
+
   function fitFleetOverview(animate=false) {
     const primaryStopIds=['commercial','conti','science','ksb','caselyHayford','prempeh','brunei','gaza','medicalVillage'];
     const points=[
@@ -1240,8 +1150,7 @@
   function animationFrame(now) {
     BUSES.forEach(bus=>updateBusPosition(bus,now));
     if(trackingBusId && now-lastTrackMapTick>850){keepTrackedBusInView();lastTrackMapTick=now;}
-    const approachRefreshInterval=(userLatLng&&!plannedTripActive)?12000:6500;
-    if(trackingBusId&&now-approachRequestAt>approachRefreshInterval){const tracked=BUSES.find(b=>b.id===trackingBusId);if(tracked)updateApproachRoute(tracked,false);}
+    // Selected route highlighting is static geometry; no bus-to-user routing requests are made.
     if(!lastTelemetryUpdate || now-lastTelemetryUpdate>=TELEMETRY_INTERVAL) updateTelemetry(now);
     requestAnimationFrame(animationFrame);
   }
@@ -1265,7 +1174,6 @@
             bus.externalLatLng=[lat,lng];bus.externalTargetHeading=Number.isFinite(reportedHeading)?((reportedHeading%360)+360)%360:bearing([previous.lat,previous.lng],[lat,lng]);
             bus.externalStart=now;bus.externalDuration=3000;bus.external=true;bus.telemetryAt=Date.now();
             if(Number.isFinite(Number(record.capacity)))bus.capacity=Math.max(1,Math.min(100,Math.round(Number(record.capacity))));
-            if(Number.isFinite(Number(record.occupancy)))bus.occupancy=Math.min(bus.capacity,Math.max(0,Math.round(Number(record.occupancy))));
             if(Number.isFinite(Number(record.speed)))bus.speed=Number(record.speed);
             bus.lastNetworkTimestamp=record.timestamp||Date.now();
           });
@@ -1393,7 +1301,7 @@
         updateSelectionVisuals();renderRouteVisibility();renderHomeBusList();setSheetState('raised');
       }else {
         const active=BUSES.find(bus=>bus.id===selectedBusId);
-        if(active&&trackingBusId)updateApproachRoute(active,true);
+        if(active&&trackingBusId)clearApproachRoute();
       }
       requestAnimationFrame(animationFrame);
     };
