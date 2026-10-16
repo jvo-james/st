@@ -4,7 +4,7 @@
   "description": "Live-style shuttle locations and arrivals at KNUST, Kumasi.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f7f8f4",
-  "theme_color": "#f7f8f4",
+  "background_color": "#f8faf7",
+  "theme_color": "#07533d",
   "icons": [{"src":"favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }

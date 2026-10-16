@@ -8,7 +8,6 @@
 
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-  const CARTO_KEY = 'cb1_4m0o_1_7bc2e168d25a26b3ddd79605';
   const GEOFENCE_METERS = 30;
   const TELEMETRY_INTERVAL = 3000;
   const CAMPUS_CENTER = [6.6778, -1.5708];
@@ -16,17 +15,19 @@
     green: '#168467', blue: '#4778f5', orange: '#ed9347', violet: '#9a6de1',
     available: '#15936a', full: '#d94848'
   };
+  // Slim top-down vehicle artwork. Its front points north (0deg), matching compass bearings.
   const busSvg = (status = 'available') => {
-    const color = status === 'full' ? COLORS.full : COLORS.available;
-    return `<svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M12.5 2.7h15C32.3 2.7 35 6 35 11.2v37.4c0 5.1-2.5 8.7-7.4 8.7h-15C7.7 57.3 5 53.7 5 48.6V11.2C5 6 7.7 2.7 12.5 2.7Z" fill="${color}" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
-      <path d="M10.2 11.2c0-2 1.3-3.4 3.2-3.4h13.2c1.9 0 3.2 1.4 3.2 3.4v8.4H10.2v-8.4Z" fill="#14382F"/>
-      <path d="M10.2 22h19.6v14.2H10.2z" fill="#f7fbf6"/>
-      <path d="M12.3 24.3h4.4v4.1h-4.4zM18 24.3h4v4.1h-4zM23.3 24.3h4.3v4.1h-4.3zM12.3 30h4.4v4.1h-4.4zM18 30h4v4.1h-4zM23.3 30h4.3v4.1h-4.3z" fill="${color}" opacity=".38"/>
-      <path d="M10.4 39h19.2m-17.4 4h15.6m-15.6 3.1h15.6" stroke="#11372D" stroke-width="1.5" stroke-linecap="round" opacity=".9"/>
-      <path d="M5.5 15v6m29-6v6M5.5 39v6m29-6v6" stroke="#263D35" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M13 3.8v2.4m14-2.4v2.4" stroke="#f7fff7" stroke-width="1.3" stroke-linecap="round"/>
-      <path d="M12.3 52.8h3.2m9 0h3.2" stroke="#e8ffe9" stroke-width="2" stroke-linecap="round"/>
+    const color = status === 'full' ? '#9b4545' : '#176a51';
+    return `<svg viewBox="0 0 36 62" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect x="6.2" y="1.6" width="23.6" height="58.8" rx="8.1" fill="#fff" stroke="#fff" stroke-width="1.8"/>
+      <rect x="8" y="3.2" width="20" height="55.6" rx="6.4" fill="${color}" stroke="#143f32" stroke-width=".8"/>
+      <path d="M10.2 10.3c0-2 1.2-3.4 3.2-3.4h9.2c2 0 3.2 1.4 3.2 3.4v8.1H10.2z" fill="#b8d9d0" stroke="#f8fffc" stroke-width="1.2"/>
+      <path d="M10.3 22.1h15.4v17.1H10.3z" fill="#e8f0eb" stroke="#f8fffc" stroke-width="1.1"/>
+      <path d="M17.95 22.5v16.3" stroke="#a9bdb3" stroke-width="1.1"/>
+      <path d="M11.2 42.1h13.6v6.3c0 1.2-.9 2.1-2.1 2.1h-9.4c-1.2 0-2.1-.9-2.1-2.1z" fill="#12392e"/>
+      <path d="M5.1 13.2h2.8v8.1H5.1m23 0h2.8v-8.1h-2.8M5.1 41.7h2.8v7.7H5.1m23 0h2.8v-7.7h-2.8" fill="#24362f"/>
+      <path d="M12 3.4h4m4 0h4" stroke="#f6fff9" stroke-width="1.4" stroke-linecap="round"/>
+      <rect x="10.6" y="53" width="3.6" height="2.4" rx=".7" fill="#eaffb9"/><rect x="22" y="53" width="3.6" height="2.4" rx=".7" fill="#eaffb9"/>
     </svg>`;
   };
   const pinSvg = `<svg viewBox="0 0 32 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 36S3.3 22 3.3 14.8a12.7 12.7 0 1 1 25.4 0C28.7 22 16 36 16 36Z" fill="#fff" stroke="#fff" stroke-width="3"/><path d="M16 34S4.9 21.8 4.9 14.8a11.1 11.1 0 1 1 22.2 0C27.1 21.8 16 34 16 34Z" fill="#2879f6"/><circle cx="16" cy="14.5" r="4.8" fill="#fff"/><circle cx="16" cy="14.5" r="2.1" fill="#2879f6"/></svg>`;
@@ -81,6 +82,10 @@
   let activeMapLayer = 'street';
   let tileErrorCount = 0, tileLoadCount = 0, satelliteTileErrors = 0, satelliteTileLoads = 0, switchedToFallback = false;
   let routeLayers = {}, routeOutlines = {}, routeGeometryReady = false;
+  let approachLine = null, approachOutline = null, approachTargetMarker = null;
+  let approachCoords = [], approachTarget = null, approachDistanceMeters = null;
+  let approachRequestAt = 0, approachRequestStart = null, approachRequestTarget = null;
+  let lastApproachPaint = 0;
   let stopMarkers = {}, stopLabelMarkers = {}, placeMarkers = {}, busMarkers = {};
   let fallbackUserNode = null;
   let routeVisibility = false;
@@ -136,13 +141,15 @@
   function busStatus(bus) { return bus.occupancy >= bus.capacity ? 'full' : 'available'; }
   function freeSeats(bus) { return Math.max(0,bus.capacity-bus.occupancy); }
   function busIconHtml(bus, selected=false) {
-    const status = busStatus(bus), rot = Number.isFinite(bus.heading) ? bus.heading : 0;
-    return `<div class="bus-marker${selected?' is-selected':''}" data-bus-marker="${bus.id}" style="--heading:${rot}deg" aria-label="${escapeHtml(bus.name)}, ${status === 'full' ? 'full' : `${freeSeats(bus)} seats available`}">${busSvg(status)}</div>`;
+    const status=busStatus(bus),rot=Number.isFinite(bus.heading)?bus.heading:0;
+    const mins=userLatLng?etaFromBusToUser(bus):nextStopInfo(bus).eta;
+    const eta=Number.isFinite(mins)?`${Math.max(1,Math.round(mins))} min`:'—';
+    return `<div class="bus-marker${selected?' is-selected':''}" data-bus-marker="${bus.id}" style="--heading:${rot}deg" aria-label="${escapeHtml(bus.name)}, ${status==='full'?'full':`${freeSeats(bus)} seats available`}"><span class="bus-vehicle">${busSvg(status)}</span><span class="bus-label">${eta}</span></div>`;
   }
   function stopIconHtml() { return `<div class="stop-pin-marker">${pinSvg}</div>`; }
   function pointIconHtml(place) { return `<div class="map-point-label">${escapeHtml(place.name)}</div>`; }
   function busDivIcon(bus, selected=false) {
-    return L.divIcon({ className:'bus-marker-shell', html:busIconHtml(bus,selected), iconSize:[25,38], iconAnchor:[12.5,19] });
+    return L.divIcon({ className:'bus-marker-shell', html:busIconHtml(bus,selected), iconSize:[22,38], iconAnchor:[11,19] });
   }
   function stopDivIcon(size=30) { return L.divIcon({ className:'stop-marker-shell', html:stopIconHtml(), iconSize:[size,size], iconAnchor:[size/2,size-1] }); }
   function stopLabelIcon(stop) { return L.divIcon({className:'stop-label-marker-shell',html:`<div class="stop-name-label">${escapeHtml(stop.short)}</div>`,iconSize:[145,20],iconAnchor:[0,10]}); }
@@ -150,7 +157,7 @@
 
   function startMap() {
     if (!map) return;
-    streetLayer = L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${encodeURIComponent(CARTO_KEY)}`, {
+    streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       subdomains:'abcd', maxZoom:19, maxNativeZoom:19, keepBuffer:3, updateWhenIdle:true, updateWhenZooming:false,
       attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
     });
@@ -178,8 +185,7 @@
     switchedToFallback = true;
     if (activeMapLayer === 'satellite') {
       activeMapLayer = 'street';
-      $('#mapStyleToggle').setAttribute('aria-pressed','false');
-      $('#mapStyleToggle').querySelector('span').textContent = 'Satellite';
+      if($('#mapStyleToggle')){$('#mapStyleToggle').setAttribute('aria-pressed','false');$('#mapStyleToggle').querySelector('span').textContent='Satellite';}
       if($('#mapAttribution'))$('#mapAttribution').innerHTML='Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · &copy; <a href="https://carto.com/attributions/" target="_blank" rel="noopener">CARTO</a>';
     }
     if (streetLayer && map.hasLayer(streetLayer)) map.removeLayer(streetLayer);
@@ -201,8 +207,7 @@
       if (map.hasLayer(streetLayer)) map.removeLayer(streetLayer);
       if (fallbackLayer && map.hasLayer(fallbackLayer)) map.removeLayer(fallbackLayer);
       if (map.hasLayer(satelliteLayer) === false) satelliteLayer.addTo(map);
-      $('#mapStyleToggle').setAttribute('aria-pressed','true');
-      $('#mapStyleToggle').querySelector('span').textContent = 'Street map';
+      if($('#mapStyleToggle')){$('#mapStyleToggle').setAttribute('aria-pressed','true');$('#mapStyleToggle').querySelector('span').textContent='Street map';}
       if($('#mapAttribution'))$('#mapAttribution').innerHTML='Imagery &copy; <a href="https://www.esri.com/en-us/legal/terms/full-master-agreement" target="_blank" rel="noopener">Esri and its data providers</a>';
     } else {
       activeMapLayer = 'street';
@@ -211,8 +216,7 @@
         fallbackLayer = L.imageOverlay('campus-fallback.svg', [[6.694,-1.583],[6.655,-1.535]], {opacity:1, interactive:false}).addTo(map);
       } else if (!map.hasLayer(streetLayer)) streetLayer.addTo(map);
       if($('#mapAttribution'))$('#mapAttribution').innerHTML=switchedToFallback?'Campus schematic · checkpoint locations based on mapped features':'Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · &copy; <a href="https://carto.com/attributions/" target="_blank" rel="noopener">CARTO</a>';
-      $('#mapStyleToggle').setAttribute('aria-pressed','false');
-      $('#mapStyleToggle').querySelector('span').textContent = 'Satellite';
+      if($('#mapStyleToggle')){$('#mapStyleToggle').setAttribute('aria-pressed','false');$('#mapStyleToggle').querySelector('span').textContent='Satellite';}
     }
   }
 
@@ -269,6 +273,7 @@
     }));
     drawRouteLayers();
     BUSES.forEach(bus => { if(bus.marker) updateBusPosition(bus, performance.now(), true); });
+    if(trackingBusId){const tracked=BUSES.find(bus=>bus.id===trackingBusId);if(tracked)updateApproachRoute(tracked,true);}
     if(activeRoute!=='all') focusRoute(activeRoute,false);
   }
   function drawRouteLayers() {
@@ -278,7 +283,7 @@
     routeLayers={}; routeOutlines={};
     Object.values(ROUTES).forEach(route => {
       routeOutlines[route.id]=L.polyline(route.geometry,{color:'#ffffff',weight:9,opacity:0,interactive:false,lineCap:'round',lineJoin:'round',className:`route-outline route-outline-${route.id}`}).addTo(map);
-      routeLayers[route.id]=L.polyline(route.geometry,{color:route.color,weight:4.5,opacity:0,interactive:false,lineCap:'round',lineJoin:'round',dashArray:'7 10',className:`route-line route-${route.id}`}).addTo(map);
+      routeLayers[route.id]=L.polyline(route.geometry,{color:route.color,weight:4,opacity:0,interactive:false,lineCap:'round',lineJoin:'round',className:`route-line route-${route.id}`}).addTo(map);
       styleRoute(route.id);
     });
   }
@@ -286,8 +291,8 @@
     const route=ROUTES[routeId];
     const tracked=trackingBusId ? BUSES.find(bus=>bus.id===trackingBusId) : null;
     const visible=!!tracked && tracked.routeId===routeId;
-    if(routeLayers[routeId]) routeLayers[routeId].setStyle({opacity:visible?.9:0,weight:visible?4.5:0,dashArray:visible?'7 9':null});
-    if(routeOutlines[routeId]) routeOutlines[routeId].setStyle({opacity:visible?.96:0,weight:visible?8:0});
+    if(routeLayers[routeId]) routeLayers[routeId].setStyle({opacity:visible?.18:0,weight:visible?4:0,dashArray:null});
+    if(routeOutlines[routeId]) routeOutlines[routeId].setStyle({opacity:visible?.50:0,weight:visible?8:0});
   }
   function renderRouteVisibility() {
     Object.keys(ROUTES).forEach(styleRoute);
@@ -334,14 +339,132 @@
     if(!route || !route.geometry?.length) return {lat:CAMPUS_CENTER[0],lng:CAMPUS_CENTER[1],heading:0,meters:0};
     const total=route.totalMeters||cumulativeGeometry(route.geometry).total;
     if(total<=0) return {lat:route.geometry[0][0],lng:route.geometry[0][1],heading:0,meters:0};
-    meters=((meters%total)+total)%total;
     const cum=route.cumulative || cumulativeGeometry(route.geometry).cumulative;
-    let lo=0,hi=cum.length-1;
-    while(lo<hi){const mid=Math.floor((lo+hi)/2);if(cum[mid]<meters)lo=mid+1;else hi=mid;}
-    const i=Math.max(1,lo), d0=cum[i-1],d1=cum[i],p=d1===d0?0:(meters-d0)/(d1-d0);
-    const a=route.geometry[i-1],b=route.geometry[i];
-    return {lat:a[0]+(b[0]-a[0])*p,lng:a[1]+(b[1]-a[1])*p,heading:bearing(a,b),meters};
+    const rawAt = distance => {
+      distance=((distance%total)+total)%total;
+      let lo=0,hi=cum.length-1;
+      while(lo<hi){const mid=Math.floor((lo+hi)/2);if(cum[mid]<distance)lo=mid+1;else hi=mid;}
+      const i=Math.max(1,lo),d0=cum[i-1],d1=cum[i],t=d1===d0?0:(distance-d0)/(d1-d0);
+      const a=route.geometry[i-1],b=route.geometry[i];
+      return {lat:a[0]+(b[0]-a[0])*t,lng:a[1]+(b[1]-a[1])*t};
+    };
+    const normalized=((meters%total)+total)%total, pos=rawAt(normalized);
+    // Look a little behind and ahead so the bus eases through route corners instead of snapping.
+    const before=rawAt(normalized-7),after=rawAt(normalized+17);
+    return { ...pos, heading:bearing([before.lat,before.lng],[after.lat,after.lng]), meters:normalized };
   }
+  function interpolateHeading(from,to,t) {
+    const delta=((to-from+540)%360)-180;
+    return ((from+delta*t)%360+360)%360;
+  }
+  function interpolateLatLng(from,to,t) {
+    return {lat:from[0]+(to[0]-from[0])*t,lng:from[1]+(to[1]-from[1])*t};
+  }
+  function routeSliceForward(route,startMeters,deltaMeters) {
+    if(!route?.geometry?.length)return [];
+    const total=route.totalMeters||cumulativeGeometry(route.geometry).total;
+    const cumulative=route.cumulative||cumulativeGeometry(route.geometry).cumulative;
+    const end=startMeters+Math.max(0,deltaMeters);
+    const coords=[],start=routePositionAt(route,startMeters),finish=routePositionAt(route,end);
+    coords.push([start.lat,start.lng]);
+    for(let lap=0;lap<=1;lap++){
+      for(let i=1;i<route.geometry.length;i++){
+        const d=(cumulative[i]||0)+lap*total;
+        if(d>startMeters+1 && d<end-1) coords.push(route.geometry[i]);
+      }
+    }
+    const last=coords[coords.length-1];
+    if(!last||Math.abs(last[0]-finish.lat)>1e-7||Math.abs(last[1]-finish.lng)>1e-7)coords.push([finish.lat,finish.lng]);
+    return coords;
+  }
+  function pickupTargetFor(bus) {
+    if(userLatLng) return {lat:userLatLng.lat,lng:userLatLng.lng,name:'Your current location',kind:'YOUR PICKUP POINT',source:'user'};
+    const next=nextStopInfo(bus);
+    const stop=next?.stop || STOP_BY_ID.get(routeOf(bus).stopIds[0]);
+    return {lat:stop.lat,lng:stop.lng,name:stop.short,kind:'NEXT CHECKPOINT',source:'stop',stopId:stop.id};
+  }
+  function ensureApproachLayers() {
+    if(!map)return;
+    if(!approachOutline)approachOutline=L.polyline([],{color:'#ffffff',weight:10,opacity:.98,interactive:false,lineCap:'round',lineJoin:'round',className:'approach-route-outline'}).addTo(map);
+    if(!approachLine)approachLine=L.polyline([],{color:'#20b982',weight:5.5,opacity:1,interactive:false,lineCap:'round',lineJoin:'round',className:'approach-route-line'}).addTo(map);
+  }
+  function clearApproachRoute() {
+    if(map){if(approachLine)map.removeLayer(approachLine);if(approachOutline)map.removeLayer(approachOutline);if(approachTargetMarker)map.removeLayer(approachTargetMarker);}
+    approachLine=null;approachOutline=null;approachTargetMarker=null;approachCoords=[];approachTarget=null;approachDistanceMeters=null;approachRequestAt=0;approachRequestStart=null;approachRequestTarget=null;
+  }
+  function paintApproachStart(bus,pos,now=performance.now()) {
+    if(!map||trackingBusId!==bus.id||!approachCoords?.length||now-lastApproachPaint<100)return;
+    lastApproachPaint=now;
+    approachCoords[0]=[pos.lat,pos.lng];
+    if(approachLine)approachLine.setLatLngs(approachCoords);
+    if(approachOutline)approachOutline.setLatLngs(approachCoords);
+  }
+  function setApproachGeometry(coords,target,distanceMeters) {
+    if(!map||!coords?.length)return;
+    ensureApproachLayers();
+    approachCoords=coords.filter(pair=>Array.isArray(pair)&&Number.isFinite(pair[0])&&Number.isFinite(pair[1]));
+    approachTarget=target;
+    approachDistanceMeters=Number.isFinite(distanceMeters)?distanceMeters:null;
+    approachOutline.setLatLngs(approachCoords);approachLine.setLatLngs(approachCoords);
+    if(target?.source==='stop'){
+      if(!approachTargetMarker)approachTargetMarker=L.circleMarker([target.lat,target.lng],{radius:6,color:'#ffffff',weight:3,fillColor:'#176a51',fillOpacity:1,interactive:false,className:'pickup-target-marker'}).addTo(map);
+      else approachTargetMarker.setLatLng([target.lat,target.lng]);
+    }else if(approachTargetMarker){map.removeLayer(approachTargetMarker);approachTargetMarker=null;}
+    const bus=BUSES.find(item=>item.id===trackingBusId);
+    if(bus){
+      const fallbackEta=etaFromBusToUser(bus);
+      const minutes=Number.isFinite(approachDistanceMeters)?Math.max(1,Math.ceil(approachDistanceMeters/250)):(fallbackEta??Math.max(1,Math.round(nextStopInfo(bus).eta)));
+      const etaText=`${minutes} min away`;
+      const etaEl=$('#heroEta');if(etaEl)etaEl.textContent=etaText;
+      const toYou=$('#busEtaToYou');if(toYou)toYou.textContent=etaText;
+    }
+  }
+  async function updateApproachRoute(bus,force=false) {
+    if(!bus||trackingBusId!==bus.id)return;
+    const target=pickupTargetFor(bus),p=bus.currentLatLng||currentBusPosition(bus),now=performance.now();
+    if($('#pickupKind'))$('#pickupKind').textContent=target.kind;
+    if($('#pickupTargetName'))$('#pickupTargetName').textContent=target.name;
+    if($('#pickupTargetHelp'))$('#pickupTargetHelp').textContent=target.source==='user'?'Route and ETA update as your shuttle moves':'Using the next checkpoint as a pickup target';
+    if($('#heroRouteLabel'))$('#heroRouteLabel').textContent=`${bus.name} · ${routeOf(bus).name}`;
+    if(!map){
+      const next=nextStopInfo(bus),route=routeOf(bus),start=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,now);
+      approachCoords=routeSliceForward(route,start,next.distance||0);approachDistanceMeters=next.distance||null;return;
+    }
+    // With no GPS permission, draw the actual segment of this shuttle's mapped route to its next checkpoint.
+    if(target.source==='stop'){
+      const next=nextStopInfo(bus),route=routeOf(bus),start=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,now);
+      const coords=routeSliceForward(route,start,next.distance||0);
+      setApproachGeometry(coords,target,next.distance||haversine([p.lat,p.lng],[target.lat,target.lng])*1.25);
+      approachRequestAt=now;
+      return;
+    }
+    const previousTarget=approachRequestTarget;
+    const movedTarget=!previousTarget||haversine(previousTarget,[target.lat,target.lng])>55;
+    const movedBus=!approachRequestStart||haversine(approachRequestStart,[p.lat,p.lng])>55;
+    const shouldFetch=force||!approachCoords.length||movedTarget||(movedBus&&now-approachRequestAt>12000);
+    if(!shouldFetch){if(approachTargetMarker){approachTargetMarker.setLatLng([target.lat,target.lng]);}return;}
+    approachRequestAt=now;approachRequestStart=[p.lat,p.lng];approachRequestTarget=[target.lat,target.lng];
+    const route=routeOf(bus),start=bus.external&&Number.isFinite(bus.distance)?bus.distance:busDistance(bus,now),next=nextStopInfo(bus);
+    const fallback=()=>{
+      const coords=routeSliceForward(route,start,next.distance||0);
+      const last=coords[coords.length-1];
+      if(last&&haversine(last,[target.lat,target.lng])>2)coords.push([target.lat,target.lng]);
+      const distance=(next.distance||haversine([p.lat,p.lng],last||[target.lat,target.lng]))+haversine(last||[target.lat,target.lng],[target.lat,target.lng]);
+      setApproachGeometry(coords.length>1?coords:[[p.lat,p.lng],[target.lat,target.lng]],target,distance*1.15);
+    };
+    try{
+      const url=`https://router.project-osrm.org/route/v1/driving/${p.lng},${p.lat};${target.lng},${target.lat}?overview=full&geometries=geojson&steps=false`;
+      const response=await fetch(url,{mode:'cors',cache:'no-store',signal:AbortSignal.timeout?AbortSignal.timeout(8000):undefined});
+      if(!response.ok)throw new Error('Route service unavailable');
+      const data=await response.json();
+      if(data.code!=='Ok'||!data.routes?.[0]?.geometry?.coordinates?.length)throw new Error('No route geometry');
+      // Ignore a late response for a vehicle which is no longer selected.
+      if(trackingBusId!==bus.id)return;
+      const coords=data.routes[0].geometry.coordinates.map(([lng,lat])=>[lat,lng]);
+      setApproachGeometry(coords,target,Number(data.routes[0].distance)||haversine([p.lat,p.lng],[target.lat,target.lng])*1.3);
+    }catch(e){if(trackingBusId===bus.id)fallback();}
+  }
+
   function busDistance(bus, now=performance.now()) {
     const route=routeOf(bus), elapsed=(now-(bus.startedAt ??= now));
     return (((elapsed+bus.offset*route.cycleMs)%route.cycleMs)/route.cycleMs)*(route.totalMeters||1);
@@ -355,7 +478,15 @@
     return at;
   }
   function currentBusPosition(bus, now=performance.now()) {
-    if(bus.external && bus.externalLatLng) return {lat:bus.externalLatLng[0],lng:bus.externalLatLng[1],heading:bus.heading,meters:Number.isFinite(bus.distance)?bus.distance:projectRouteMeters(routeOf(bus),bus.externalLatLng)};
+    if(bus.external && bus.externalLatLng) {
+      const from=bus.externalFrom||bus.externalLatLng,to=bus.externalLatLng;
+      const duration=Math.max(900,Math.min(5000,bus.externalDuration||3000));
+      const t=bus.externalStart?Math.max(0,Math.min(1,(now-bus.externalStart)/duration)):1;
+      const point=interpolateLatLng(from,to,t);
+      const targetHeading=Number.isFinite(bus.externalTargetHeading)?bus.externalTargetHeading:(bus.heading||0);
+      const heading=interpolateHeading(Number.isFinite(bus.externalFromHeading)?bus.externalFromHeading:(bus.heading||0),targetHeading,t);
+      return {...point,heading,meters:projectRouteMeters(routeOf(bus),[point.lat,point.lng])};
+    }
     const route=routeOf(bus); return routePositionAt(route,busDistance(bus,now));
   }
   function updateBusPosition(bus, now=performance.now(), force=false) {
@@ -372,7 +503,8 @@
       bus.marker.setZIndexOffset(selected?1800:1000);
     }
     const el=bus.marker.getElement();
-    if(el){const inner=el.querySelector('.bus-marker');if(inner){inner.style.setProperty('--heading',`${pos.heading}deg`);inner.classList.toggle('is-selected',selected);}}
+    if(el){const inner=el.querySelector('.bus-marker');if(inner){inner.style.setProperty('--heading',`${pos.heading}deg`);inner.classList.toggle('is-selected',selected);const label=inner.querySelector('.bus-label');if(label){const mins=userLatLng?etaFromBusToUser(bus):nextStopInfo(bus,now).eta;label.textContent=Number.isFinite(mins)?`${Math.max(1,Math.round(mins))} min`:'—';}}}
+    if(trackingBusId===bus.id) paintApproachStart(bus,pos,now);
     const shown=!trackingBusId||bus.id===trackingBusId;
     bus.marker.setOpacity(shown?1:0);
     if(el) el.style.pointerEvents=shown?'auto':'none';
@@ -530,15 +662,18 @@
   function openBusDetail(id) {
     const bus=BUSES.find(b=>b.id===id);if(!bus)return;
     screenMode='bus';selectedBusId=bus.id;selectedStopId=null;
+    trackingBusId=bus.id;routeVisibility=true;
     $('#sheetHome').hidden=true;$('#sheetDetail').hidden=false;
     $('#busDetailView').hidden=false;$('#stopDetailView').hidden=true;
-    $('#detailEyebrow').textContent='SHUTTLE DETAILS';
+    $('#detailEyebrow').textContent='SHUTTLE TRACKING';
     $('#detailTitle').textContent=bus.name;
-    $('#detailSubtitle').textContent='Location updates automatically';
+    $('#detailSubtitle').textContent=`${routeOf(bus).name} · Approaching pickup`;
     $('#detailBell').style.visibility='hidden';
     updateSelectionVisuals();renderBusDetail();
     setSheetState('detail');
-    const p=bus.currentLatLng||currentBusPosition(bus);if(map)map.panTo([p.lat,p.lng],{animate:true,duration:.35});else focusFallbackAt(p.lat,p.lng,420);
+    Object.keys(ROUTES).forEach(styleRoute);
+    updateApproachRoute(bus,true);
+    focusTrackedVehicles(true);lastTrackMapTick=performance.now();
   }
   function nearestMappedPlace(lat,lng) {
     const all=[...PLACES.map(place=>({name:place.name,lat:place.lat,lng:place.lng})),...STOPS.map(stop=>({name:stop.short,lat:stop.lat,lng:stop.lng}))];
@@ -549,9 +684,13 @@
   function etaFromBusToUser(bus) {
     if(!userLatLng)return null;
     const pos=bus.currentLatLng||currentBusPosition(bus);
-    const meters=haversine([pos.lat,pos.lng],[userLatLng.lat,userLatLng.lng]);
-    // Campus-speed estimate, with a road-distance allowance over straight-line distance.
-    return Math.max(1,Math.round((meters*1.28)/250));
+    const direct=haversine([pos.lat,pos.lng],[userLatLng.lat,userLatLng.lng])*1.28;
+    let remaining=direct;
+    if(trackingBusId===bus.id&&Number.isFinite(approachDistanceMeters)&&approachRequestStart){
+      const travelled=haversine(approachRequestStart,[pos.lat,pos.lng]);
+      remaining=Math.max(direct,approachDistanceMeters-travelled);
+    }
+    return Math.max(1,Math.ceil(remaining/250));
   }
 
   function renderBusDetail() {
@@ -562,9 +701,17 @@
     $('#quickVehiclePlate').textContent=bus.plate;
     const pos=bus.currentLatLng||currentBusPosition(bus),near=nearestMappedPlace(pos.lat,pos.lng);
     $('#busLiveLocation').textContent=near.distance<500?`Near ${near.name}`:`Around ${near.name}`;
-    const userEta=etaFromBusToUser(bus);$('#busEtaToYou').textContent=userEta===null?'Enable location':`${userEta} min away`;
-    $('#busFeedStatus').textContent=bus.external&&Date.now()-bus.telemetryAt<12000?'Location connected':'Location updating';
-    $('#centerSelected').innerHTML=(trackingBusId===bus.id?'Stop tracking':'Track this shuttle')+' <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3m0 15v3m-10.5-10.5h3m15 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+    const userEta=etaFromBusToUser(bus);
+    const eta=userEta===null?next.eta:userEta;
+    const etaText=`${Math.max(1,Math.round(eta))} min away`;
+    $('#busEtaToYou').textContent=etaText;
+    if($('#heroEta'))$('#heroEta').textContent=etaText;
+    if($('#heroRouteLabel'))$('#heroRouteLabel').textContent=`${bus.name} · ${route.name}`;
+    if($('#pickupKind'))$('#pickupKind').textContent=userLatLng?'YOUR PICKUP POINT':'NEXT CHECKPOINT';
+    if($('#pickupTargetName'))$('#pickupTargetName').textContent=userLatLng?'Your current location':(next.stop?.short||'Next checkpoint');
+    if($('#pickupTargetHelp'))$('#pickupTargetHelp').textContent=userLatLng?'Route and ETA update as your shuttle moves':'Allow location access to estimate arrival to you';
+    $('#busFeedStatus').textContent=bus.external&&Date.now()-bus.telemetryAt<12000?'Location connected':'Demo route movement';
+    $('#centerSelected').innerHTML=(trackingBusId===bus.id?'Recenter shuttle':'Track this shuttle')+' <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3m0 15v3m-10.5-10.5h3m15 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
     $('#centerSelected').classList.toggle('is-active',trackingBusId===bus.id);
     $('#seatStatus').classList.toggle('is-full',status==='full');
     $('#seatStatus').innerHTML=`<i></i><span>${status==='full'?'Full shuttle':'Seats available'}</span>`;
@@ -572,6 +719,7 @@
     $('#occupancyFill').style.width=`${Math.min(100,bus.occupancy/bus.capacity*100)}%`;
     $('#occupancyFill').classList.toggle('is-full',status==='full');
     $('#occupancyFootText').textContent=status==='full'?'No seats available':`${free} ${free===1?'seat':'seats'} available`;
+    if($('#rideSeatsLeft'))$('#rideSeatsLeft').textContent=status==='full'?'Full':`${free} available`;
     $('#occupancyPercent').textContent=`${Math.round(bus.occupancy/bus.capacity*100)}% full`;
     $('#driverName').textContent=bus.driver;$('#driverInitials').textContent=bus.driver.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();$('#vehiclePlate').textContent=bus.plate;
     $('#detailRouteDot').style.background=route.color;
@@ -580,7 +728,7 @@
   }
   function openStopDetail(id) {
     const stop=STOP_BY_ID.get(id);if(!stop)return;
-    screenMode='stop';selectedStopId=id;
+    screenMode='stop';selectedStopId=id;trackingBusId=null;routeVisibility=false;clearApproachRoute();Object.keys(ROUTES).forEach(styleRoute);
     $('#sheetHome').hidden=true;$('#sheetDetail').hidden=false;
     $('#busDetailView').hidden=true;$('#stopDetailView').hidden=false;
     $('#detailEyebrow').textContent='CHECKPOINT';$('#detailTitle').textContent=stop.short;
@@ -590,8 +738,7 @@
     $('#stopAlertButton').classList.toggle('is-active',alerts.has(id));
     $('#stopDetailName').textContent=stop.name;$('#stopDetailDescription').textContent=stop.description;
     renderStopArrivals();
-    $('#bottomSheet').classList.add('is-detail');$('#bottomSheet').classList.remove('is-expanded');
-    $('#sheetHandle').setAttribute('aria-expanded','true');
+    setSheetState('detail');
     if(map)map.panTo([stop.lat,stop.lng],{animate:true,duration:.45});else focusFallbackAt(stop.lat,stop.lng,390);
   }
   function renderStopArrivals() {
@@ -603,8 +750,9 @@
     $('#stopAlertButton').classList.toggle('is-active',alerts.has(stop.id));$('#stopAlertButton').querySelector('span').textContent=alerts.has(stop.id)?'Alert on':'Alert me';
   }
   function closeDetail() {
-    screenMode='home';selectedStopId=null;
+    screenMode='home';selectedStopId=null;trackingBusId=null;routeVisibility=false;
     $('#sheetHome').hidden=false;$('#sheetDetail').hidden=true;
+    clearApproachRoute();Object.keys(ROUTES).forEach(styleRoute);
     setSheetState('collapsed');
     updateSelectionVisuals();findNearestStop();
   }
@@ -618,65 +766,78 @@
     sheet.classList.toggle('is-expanded',state==='expanded');
     sheet.style.height='';sheet.style.transition='';
     $('#sheetHandle').setAttribute('aria-expanded',String(state!=='collapsed'));
-    $('#sheetHandle').setAttribute('aria-label',state==='collapsed'?'Open nearby shuttles':'Swipe down to collapse, swipe up to expand');
+    $('#sheetHandle').setAttribute('aria-label',state==='collapsed'?'Open shuttle details':'Swipe down to collapse, swipe up to expand');
+    $('#sheetHandle').querySelector('span').setAttribute('aria-hidden','true');
     if(state==='raised'||state==='expanded') renderHomeBusList();
     if(state==='detail' && screenMode==='bus') renderBusDetail();
     if(map) setTimeout(()=>map.invalidateSize({pan:false}),300);
   }
   function setSheetExpanded(expanded) { setSheetState(expanded?'expanded':'collapsed'); }
   function toggleSheet() {
-    if (suppressSheetClick) { suppressSheetClick = false; return; }
-    if(sheetState==='collapsed') setSheetState(screenMode==='bus'?'detail':'raised');
-    else if(sheetState==='raised') setSheetState('expanded');
+    if(suppressSheetClick){suppressSheetClick=false;return;}
+    if(sheetState==='collapsed')setSheetState(screenMode==='bus'?'detail':'raised');
+    else if(sheetState==='raised'||sheetState==='detail')setSheetState('expanded');
     else setSheetState('collapsed');
   }
   function bindSheetSwipe() {
     const sheet=$('#bottomSheet');
-    let startY=null,startHeight=0,lastY=0,lastTime=0,dragging=false;
-    const dragOrigins='.sheet-grab-area,.sheet-collapsed-summary,.nearest-row,.next-arrival-line,.detail-header,.bus-identity-row,.bus-quick-facts,.bus-action-row';
+    let startY=null,startX=null,startHeight=0,lastY=0,lastTime=0,dragging=false,pointerId=null;
+    const interactive='button,a,input,select,textarea,[role="button"],[data-no-sheet-drag]';
     sheet.addEventListener('pointerdown',event=>{
-      if(!event.target.closest(dragOrigins)) return;
-      if(event.target.closest('button') && !event.target.closest('#sheetHandle')) return;
-      startY=event.clientY;lastY=startY;lastTime=performance.now();startHeight=sheet.getBoundingClientRect().height;dragging=true;
-      sheet.style.transition='none';
+      if(event.button!==undefined&&event.button!==0)return;
+      // Controls retain their click behaviour; the rest of the sheet can be dragged, not only the handle.
+      if(event.target.closest(interactive)&&!event.target.closest('#sheetHandle'))return;
+      if(event.target.closest('.sheet-expanded-content'))return; // preserve scrolling through long lists
+      startY=event.clientY;startX=event.clientX;lastY=startY;lastTime=performance.now();
+      startHeight=sheet.getBoundingClientRect().height;dragging=true;pointerId=event.pointerId;
+      sheet.classList.add('is-dragging');sheet.style.transition='none';
       try{sheet.setPointerCapture(event.pointerId);}catch(e){}
     });
     sheet.addEventListener('pointermove',event=>{
-      if(!dragging||startY===null)return;
-      const dy=startY-event.clientY;
-      const maxHeight=Math.max(240,window.innerHeight-(parseFloat(getComputedStyle(sheet).bottom)||0)-20);
-      const next=Math.max(52,Math.min(maxHeight,startHeight+dy));
+      if(!dragging||startY===null||event.pointerId!==pointerId)return;
+      const totalDy=startY-event.clientY,totalDx=event.clientX-startX;
+      if(Math.abs(totalDx)>Math.abs(totalDy)*1.3){return;}
+      const parentHeight=sheet.parentElement?.clientHeight||window.innerHeight;
+      const maxHeight=Math.max(180,parentHeight-14);
+      const minHeight=56;
+      const next=Math.max(minHeight,Math.min(maxHeight,startHeight+totalDy));
       sheet.style.height=`${next}px`;
       lastY=event.clientY;lastTime=performance.now();
-      if(Math.abs(dy)>5)event.preventDefault();
+      if(Math.abs(totalDy)>5&&event.cancelable)event.preventDefault();
     });
     const finish=event=>{
-      if(!dragging||startY===null)return;
+      if(!dragging||startY===null||event.pointerId!==pointerId)return;
       const dy=startY-event.clientY,current=sheet.getBoundingClientRect().height;
       const velocity=(event.clientY-lastY)/Math.max(1,performance.now()-lastTime);
-      dragging=false;startY=null;sheet.style.transition='';
-      if(Math.abs(dy)<14 && Math.abs(velocity)<.25){sheet.style.height='';return;}
+      dragging=false;startY=null;pointerId=null;sheet.classList.remove('is-dragging');sheet.style.transition='';
+      if(Math.abs(dy)<10&&Math.abs(velocity)<.22){sheet.style.height='';return;}
       suppressSheetClick=true;
-      if(dy>45||velocity<-.45){
+      const up=dy>45||velocity<-.42,down=dy< -45||velocity>.42;
+      if(up){
         if(sheetState==='collapsed')setSheetState(screenMode==='bus'?'detail':'raised');
-        else if(sheetState==='raised')setSheetState('expanded');
-        else if(sheetState==='detail')setSheetState('detail');
+        else if(sheetState==='raised'||sheetState==='detail')setSheetState('expanded');
         else setSheetState('expanded');
-      } else if(dy< -45||velocity>.45){
+      }else if(down){
         if(sheetState==='expanded')setSheetState(screenMode==='bus'?'detail':'raised');
         else setSheetState('collapsed');
-      } else {
-        // A drag that didn't cross a snap threshold returns to its nearest intended state.
-        const collapsedThreshold=88,expandedThreshold=Math.min(window.innerHeight*.62,500);
-        if(current<collapsedThreshold)setSheetState('collapsed');
-        else if(current>expandedThreshold)setSheetState('expanded');
-        else if(screenMode==='bus')setSheetState('detail');else setSheetState('raised');
+      }else{
+        const h=sheet.getBoundingClientRect().height;
+        const parentHeight=sheet.parentElement?.clientHeight||window.innerHeight;
+        const collapsed=64, intermediate=screenMode==='bus'?Math.min(parentHeight*.48,440):Math.min(parentHeight*.34,300);
+        const expanded=Math.min(parentHeight*.78,680);
+        const snaps=[{state:'collapsed',height:collapsed},{state:screenMode==='bus'?'detail':'raised',height:intermediate},{state:'expanded',height:expanded}];
+        snaps.sort((a,b)=>Math.abs(a.height-h)-Math.abs(b.height-h));setSheetState(snaps[0].state);
       }
-      window.setTimeout(()=>{suppressSheetClick=false;},250);
+      window.setTimeout(()=>{suppressSheetClick=false;},260);
     };
     sheet.addEventListener('pointerup',finish);sheet.addEventListener('pointercancel',finish);
-    // Short click/tap on the grab handle still toggles naturally.
     $('#sheetHandle').addEventListener('click',toggleSheet);
+    // Keyboard users can operate the same three sheet positions.
+    $('#sheetHandle').addEventListener('keydown',event=>{
+      if(event.key==='ArrowUp'){event.preventDefault();setSheetState('expanded');}
+      if(event.key==='ArrowDown'){event.preventDefault();setSheetState('collapsed');}
+      if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSheet();}
+    });
   }
 
   function updateLocation(lat,lng,accuracy=20) {
@@ -685,6 +846,7 @@
     userMarker.setLatLng([lat,lng]);userMarker.setOpacity(1);
     userAccuracyCircle.setLatLng([lat,lng]);userAccuracyCircle.setRadius(Math.min(Math.max(accuracy||20,15),180));userAccuracyCircle.setStyle({color:'#2879f6',weight:1,opacity:.45,fillColor:'#2879f6',fillOpacity:.07});
     findNearestStop();
+    if(trackingBusId){const tracked=BUSES.find(b=>b.id===trackingBusId);if(tracked)updateApproachRoute(tracked,false);}
     if(followingUser)map.panTo([lat,lng],{animate:true,duration:.35});
   }
   function requestLocation(follow=false, quiet=false) {
@@ -706,33 +868,35 @@
   }
   function centerSelected() {
     const bus=BUSES.find(b=>b.id===selectedBusId);if(!bus)return;
-    if(trackingBusId===bus.id){
-      trackingBusId=null;routeVisibility=false;followingUser=false;
-      Object.keys(ROUTES).forEach(styleRoute);updateFallbackRouteStyles();
-      BUSES.forEach(vehicle=>updateBusPosition(vehicle,performance.now(),true));
-      setSheetState('detail');renderBusDetail();
-      if(map)map.setView(CAMPUS_CENTER,15,{animate:true});
-      showToast('Showing all nearby shuttles');return;
-    }
-    trackingBusId=bus.id;routeVisibility=true;followingUser=false;
-    Object.keys(ROUTES).forEach(styleRoute);updateFallbackRouteStyles();
-    BUSES.forEach(vehicle=>updateBusPosition(vehicle,performance.now(),true));
+    trackingBusId=bus.id;routeVisibility=true;
+    Object.keys(ROUTES).forEach(styleRoute);updateSelectionVisuals();
+    updateApproachRoute(bus,true);focusTrackedVehicles(true);lastTrackMapTick=performance.now();
     renderBusDetail();setSheetState('detail');
-    focusTrackedVehicles(true);lastTrackMapTick=performance.now();
-    showToast(`Tracking ${bus.name}`);
+    showToast(`Following ${bus.name}`);
   }
+
   function focusTrackedVehicles(animate=false) {
     if(!trackingBusId)return;
     const bus=BUSES.find(item=>item.id===trackingBusId);if(!bus)return;
-    const p=bus.currentLatLng||currentBusPosition(bus);
+    const p=bus.currentLatLng||currentBusPosition(bus), target=pickupTargetFor(bus);
     if(map){
-      if(userLatLng){
-        const bounds=L.latLngBounds([[p.lat,p.lng],[userLatLng.lat,userLatLng.lng]]);
-        map.fitBounds(bounds,{paddingTopLeft:[28,42],paddingBottomRight:[28,window.innerWidth<=760?255:75],maxZoom:16.4,animate});
+      const points=[[p.lat,p.lng],[target.lat,target.lng]];
+      if(points.every(pair=>pair.every(Number.isFinite))){
+        map.fitBounds(L.latLngBounds(points),{paddingTopLeft:[38,64],paddingBottomRight:[38,window.innerWidth<=760?Math.min(360,window.innerHeight*.44):90],maxZoom:17,animate});
       } else map.setView([p.lat,p.lng],Math.max(map.getZoom(),16.2),{animate});
-    } else if(fallbackSvg){
-      if(userLatLng)fitFallbackToPoints([[p.lat,p.lng],[userLatLng.lat,userLatLng.lng]]);
-      else focusFallbackAt(p.lat,p.lng,390);
+    }else if(fallbackSvg){fitFallbackToPoints([[p.lat,p.lng],[target.lat,target.lng]]);}
+  }
+  function keepTrackedBusInView() {
+    if(!map||!trackingBusId)return;
+    const bus=BUSES.find(item=>item.id===trackingBusId);if(!bus?.currentLatLng)return;
+    const p=map.latLngToContainerPoint([bus.currentLatLng.lat,bus.currentLatLng.lng]),size=map.getSize();
+    const sheetHeight=$('#bottomSheet').getBoundingClientRect().height;
+    const safeBottom=Math.max(100,sheetHeight+28),top=56,left=42,right=size.x-42,bottom=size.y-safeBottom;
+    let targetX=p.x,targetY=p.y;
+    if(p.x<left)targetX=left+20;else if(p.x>right)targetX=right-20;
+    if(p.y<top)targetY=top+26;else if(p.y>bottom)targetY=Math.max(top+40,bottom-24);
+    if(Math.abs(targetX-p.x)>2||Math.abs(targetY-p.y)>2){
+      map.panBy([p.x-targetX,p.y-targetY],{animate:true,duration:.42,easeLinearity:.28,noMoveStart:true});
     }
   }
 
@@ -794,7 +958,9 @@
   }
   function animationFrame(now) {
     BUSES.forEach(bus=>updateBusPosition(bus,now));
-    if(trackingBusId && now-lastTrackMapTick>1800){focusTrackedVehicles(false);lastTrackMapTick=now;}
+    if(trackingBusId && now-lastTrackMapTick>850){keepTrackedBusInView();lastTrackMapTick=now;}
+    if(trackingBusId && userLatLng && now-approachRequestAt>12000){const tracked=BUSES.find(b=>b.id===trackingBusId);if(tracked)updateApproachRoute(tracked,false);}
+    if(trackingBusId && !userLatLng && now-approachRequestAt>2200){const tracked=BUSES.find(b=>b.id===trackingBusId);if(tracked)updateApproachRoute(tracked,false);}
     if(!lastTelemetryUpdate || now-lastTelemetryUpdate>=TELEMETRY_INTERVAL) updateTelemetry(now);
     requestAnimationFrame(animationFrame);
   }
@@ -812,11 +978,13 @@
             const id=record.busId||record.id||record.vehicleId;
             const bus=BUSES.find(b=>b.id===id);if(!bus)return;
             const lat=Number(record.lat??record.latitude),lng=Number(record.lng??record.lon??record.longitude);
-            if(!Number.isFinite(lat)||!Number.isFinite(lng))return;
-            bus.externalLatLng=[lat,lng];bus.external=true;bus.telemetryAt=Date.now();
-            bus.heading=Number(record.heading??record.bearing??bus.heading)||0;
-            if(Number.isFinite(Number(record.occupancy)))bus.occupancy=Math.min(bus.capacity,Math.max(0,Number(record.occupancy)));
-            if(Number.isFinite(Number(record.capacity)))bus.capacity=Math.max(1,Number(record.capacity));
+            if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat < -90||lat > 90||lng < -180||lng > 180)return;
+            const now=performance.now(),previous=currentBusPosition(bus,now),reportedHeading=Number(record.heading??record.bearing);
+            bus.externalFrom=[previous.lat,previous.lng];bus.externalFromHeading=previous.heading||bus.heading||0;
+            bus.externalLatLng=[lat,lng];bus.externalTargetHeading=Number.isFinite(reportedHeading)?((reportedHeading%360)+360)%360:bearing([previous.lat,previous.lng],[lat,lng]);
+            bus.externalStart=now;bus.externalDuration=3000;bus.external=true;bus.telemetryAt=Date.now();
+            if(Number.isFinite(Number(record.capacity)))bus.capacity=Math.max(1,Math.min(100,Math.round(Number(record.capacity))));
+            if(Number.isFinite(Number(record.occupancy)))bus.occupancy=Math.min(bus.capacity,Math.max(0,Math.round(Number(record.occupancy))));
             if(Number.isFinite(Number(record.speed)))bus.speed=Number(record.speed);
             bus.lastNetworkTimestamp=record.timestamp||Date.now();
           });
@@ -862,7 +1030,7 @@
       return `<g data-fallback-route="${route.id}"><polyline class="fallback-route-outline" points="${points}"/><polyline class="fallback-route-line" data-fallback-route-line="${route.id}" points="${points}" stroke="${route.color}"/></g>`;
     }).join('');
     const stopSvg='';
-    const busGroup=BUSES.map(bus=>{const pos=currentBusPosition(bus,performance.now());const [x,y]=point(pos.lat,pos.lng);return `<g class="local-fallback-bus" data-open-bus="${bus.id}" data-bus-pos="${bus.id}" transform="translate(${x} ${y}) rotate(${pos.heading}) scale(.55)" role="button" tabindex="0" aria-label="${escapeHtml(bus.name)}">${busSvg(busStatus(bus)).replace('<svg viewBox="0 0 40 60"','<svg x="-20" y="-30" width="40" height="60" viewBox="0 0 40 60"')}<title>${escapeHtml(bus.name)}</title></g>`;}).join('');
+    const busGroup=BUSES.map(bus=>{const pos=currentBusPosition(bus,performance.now());const [x,y]=point(pos.lat,pos.lng);return `<g class="local-fallback-bus" data-open-bus="${bus.id}" data-bus-pos="${bus.id}" transform="translate(${x} ${y}) rotate(${pos.heading}) scale(.55)" role="button" tabindex="0" aria-label="${escapeHtml(bus.name)}">${busSvg(busStatus(bus)).replace('<svg viewBox="0 0 36 62"','<svg x="-18" y="-31" width="36" height="62" viewBox="0 0 36 62"')}<title>${escapeHtml(bus.name)}</title></g>`;}).join('');
     const [ux,uy]=point(CAMPUS_CENTER[0],CAMPUS_CENTER[1]);
     fallbackProject=point;
     holder.innerHTML=`<svg id="fallbackSvg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid slice" role="application" aria-label="Interactive schematic map of KNUST"><image href="campus-fallback.svg" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="none"/><g class="fallback-route-layer">${routeSvg}</g><g class="fallback-shuttle-layer">${stopSvg}${busGroup}<g id="fallbackUserMarker" opacity="0" transform="translate(${ux} ${uy})"><circle class="fallback-user-pulse" r="18" fill="#2879f6" opacity=".18"/><circle r="10" fill="#fff"/><circle r="7" fill="#2879f6" stroke="#fff" stroke-width="2"/></g></g></svg>`;
@@ -906,6 +1074,7 @@
     $('#zoomIn').addEventListener('click',()=>map?map.zoomIn():zoomFallback(.78));$('#zoomOut').addEventListener('click',()=>map?map.zoomOut():zoomFallback(1.28));
     $('#fitCampus').addEventListener('click',()=>{if(map)map.setView(CAMPUS_CENTER,15,{animate:true});else focusFallbackAt(CAMPUS_CENTER[0],CAMPUS_CENTER[1],620);});
     $('#locateButton').addEventListener('click',()=>requestLocation(true));
+    const pickupLocate=$('#pickupLocate');if(pickupLocate)pickupLocate.addEventListener('click',()=>requestLocation(true));
     $('#nearestBell').addEventListener('click',()=>toggleAlert(lastNearestId));
     bindSheetSwipe();
     $('#detailBack').addEventListener('click',closeDetail);
@@ -932,9 +1101,11 @@
       loadRoadGeometry().then(()=>{drawRouteLayers();BusesReposition();}).catch(()=>{});
       function BusesReposition(){BUSES.forEach(bus=>updateBusPosition(bus,performance.now(),true));}
     } else initLocalFallback();
-    bindEvents();renderQuickCheckpoints();findNearestStop();setSheetState('collapsed');
+    bindEvents();renderQuickCheckpoints();findNearestStop();
     connectExternalFeed();
-    const clock=()=>{const now=new Date();$('#lastUpdate').textContent='Updated just now';};clock();setInterval(clock,3000);
+    const clock=()=>{const fresh=BUSES.some(bus=>bus.external&&Date.now()-bus.telemetryAt<12000);$('#lastUpdate').textContent=fresh?'Live location updates':'Simulated route movement';};clock();setInterval(clock,3000);
+    // Open the selected shuttle by default so the route/ETA experience is immediately visible.
+    openBusDetail(selectedBusId);
     if(navigator.geolocation){setTimeout(()=>requestLocation(false,true),1200);}
     requestAnimationFrame(animationFrame);
     if('serviceWorker' in navigator && location.protocol!=='file:')navigator.serviceWorker.register('service-worker.js').catch(()=>{});

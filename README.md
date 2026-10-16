@@ -1,70 +1,66 @@
 # KNUST Shuttle Tracker
 
-A phone-first, map-focused shuttle tracker for the KNUST campus. The design keeps the map clear and uses small, elongated, transparent SVG shuttle icons: **green means seats are available; red means the shuttle is full**.
+A mobile-first campus shuttle tracking prototype built with HTML, CSS, vanilla JavaScript and Leaflet. It includes a map-first interface, directional shuttle markers, a draggable ride sheet, route highlighting, arrival estimates, checkpoint search and a simulated route-motion model so the interface can be exercised without a live fleet feed.
 
 ## Run locally
 
-Use a local web server rather than opening `index.html` directly. This enables browser geolocation and gives the service worker a secure local origin.
-
-**Windows**
-
-```powershell
-py -m http.server 8000
-```
-
-**macOS / Linux**
+Use a local web server rather than opening `index.html` with `file://` so the browser can load the map library and register the service worker.
 
 ```bash
-python3 -m http.server 8000
+python -m http.server 8000
 ```
 
-Open <http://localhost:8000> in your browser. Allow location access to show your blue position dot and calculate an estimated arrival time from your location to the selected shuttle.
+Then open <http://localhost:8000>.
 
-## Using the map
+You can also use the VS Code **Live Server** extension. The map requires an internet connection unless the bundled campus schematic fallback is active. Location-based features require a secure context such as `localhost` or HTTPS.
 
-- The map opens with all shuttles visible and no route lines or checkpoint pins overlaid. Campus landmark labels remain visible as you zoom in.
-- Tap a shuttle to open a compact information sheet with its registration plate, nearby landmark, seat status, location update status and estimated arrival to you.
-- Drag the sheet handle or its header **up** to open the nearby-shuttle list and **down** to collapse it. The collapsed strip stays available so you can pull the sheet up again; no Back button is needed.
-- Tap **Track this shuttle** to zoom toward the selected shuttle and your location (when permission is granted), hide other vehicles and show the selected vehicle's route as a dashed guide. Tap **Stop tracking** to restore the full set of shuttles and clear the route line.
-- If browser GPS is denied or unavailable, the app still shows shuttle movement around campus, but the ETA-to-you field asks you to enable location.
+## Interface updates
 
-## Vehicle location feed
+- **Light campus basemap:** CARTO Voyager tiles through Leaflet, with map attribution shown on the map. No Google Maps API key or Google Maps billing setup is required for this prototype. The public tile service still has its own usage terms and availability limits; do not assume it is a guaranteed production hosting service.
+- **Slim, directional shuttle marker:** a narrow top-down SVG with a north-facing base orientation. Its vehicle art rotates along the route bearing, while the ETA bubble stays upright.
+- **Route-to-pickup highlight:** selecting a shuttle opens the ride sheet and highlights its approach to the next checkpoint. When device location is available, the app attempts to request road geometry from the public OSRM demo service to the user's location. The fallback joins the shuttle's route to its next checkpoint and estimates the remaining distance.
+- **Smooth movement:** simulated vehicles move continuously along route geometry, and the heading uses a short look-ahead around corners. When a WebSocket feed is configured, external GPS fixes are interpolated over a short interval rather than applied as abrupt jumps.
+- **Swipeable bottom sheet:** drag the summary/header/hero area up or down to snap between collapsed, shuttle-detail and expanded states. Controls keep their normal click behaviour, and the scrollable list/detail content can still scroll.
+- **Search and location controls:** search shuttles, checkpoints and landmarks, center the map, request device location and browse nearby services.
+- **Offline fallback:** if the map library cannot load, the bundled campus schematic still provides a lightweight visual prototype. This is approximate geometry, not a verified campus road map.
 
-When no external feed is configured, vehicles move locally along their assigned route so the map, markers, selection sheet and tracking interaction can be exercised. Sample plates, driver names and occupancy values are placeholders and must be replaced with verified fleet data for a real service. The location estimate and arrival time are estimates, not dispatch guarantees.
+## Current prototype data and limitations
 
-To connect a WebSocket server, open the app with a URL such as:
+Shuttle IDs, route loops, passenger counts, drivers, plates, checkpoints and ETAs are sample values used for interface testing. Confirm checkpoint coordinates and route geometry against actual KNUST operations before using the app for travel decisions.
 
-`https://your-domain.example/?feed=wss%3A%2F%2Fyour-api.example%2Fvehicles`
+Road routing is attempted through `https://router.project-osrm.org`, a public demonstration service. It can be rate-limited, unavailable, or return imperfect campus routing. The fallback is intentionally visual and should not be treated as turn-by-turn navigation. CARTO's public tile endpoints and OSRM's demo endpoint are not a substitute for a production map/routing agreement if usage grows.
 
-The page accepts one JSON vehicle record per message, an array of records, or an object containing a `vehicles` array. Example record:
+The app optionally accepts a WebSocket URL through the `feed` query parameter:
+
+```text
+https://your-host/knust-shuttle/?feed=wss://your-service.example/vehicles
+```
+
+Each message can be one vehicle record, an array of records, or an object with a `vehicles` array. Vehicle records use this shape:
 
 ```json
 {
   "busId": "K-01",
-  "lat": 6.67920,
-  "lng": -1.57083,
-  "heading": 125,
+  "lat": 6.6778,
+  "lng": -1.5708,
+  "heading": 90,
+  "speed": 18,
   "occupancy": 8,
   "capacity": 18,
-  "timestamp": "2026-10-15T12:00:00Z"
+  "timestamp": 1792123456789
 }
 ```
 
-Vehicle IDs must match `K-01` to `K-04` unless you update the fleet records in `script.js`. Driver devices should upload approved coordinates and heading roughly every three seconds. A production backend still needs driver authentication, coordinate validation, authorized fleet data, reliable geofencing, accurate stop/road coordinates, and push notification delivery. Do not place private backend credentials in browser code.
+Only finite, in-range GPS coordinates are accepted. Capacity and occupancy are bounded and normalised client-side; production validation and authentication should also happen on the server.
 
-## Map services and privacy
+## Main files
 
-The primary street map uses CARTO Voyager tiles with OpenStreetMap/CARTO attribution. The CARTO basemap key is included in the browser-side tile URL so map tiles can load. Since client-side keys are visible by design, restrict the key to your deployed domain in the CARTO dashboard, keep it scoped to this project, and rotate it if needed. Satellite imagery is intentionally omitted from the simplified interface.
+- `index.html` — app shell, map container, map controls, search and bottom-sheet UI.
+- `styles.css` — visual design, mobile layout and sheet drag surfaces.
+- `script.js` — sample routes and shuttles, route/ETA calculations, animation, map layers, search, alerts and optional WebSocket feed.
+- `campus-fallback.svg` — bundled schematic map used if Leaflet or online map assets cannot load.
+- `service-worker.js` — application-shell cache and offline navigation fallback.
 
-If external map tiles are blocked or unavailable, the app switches to the included campus schematic. It is an orientation fallback, not a surveyed campus map. The public OSRM routing service is used to request road-following route geometry when available; if unavailable, the local route model is used instead. Confirm the precise shuttle paths and boarding areas with KNUST before public launch.
+## Before a real launch
 
-## Files
-
-- `index.html` — responsive interface and map-library fallback loader
-- `styles.css` — responsive map-first interface, sheet drag states, and vehicle marker styling
-- `script.js` — shuttle movement, seat status, estimated arrivals, selected-vehicle tracking, location and optional WebSocket feed
-- `fallback.js` — fallback loader if the Leaflet mapping library cannot load
-- `campus-fallback.svg` — campus schematic used when map tiles cannot load
-- `favicon.svg` — app icon
-- `app.webmanifest` — install metadata
-- `service-worker.js` — local application-shell cache
+Use an owned/contracted tile and routing service at the expected scale, add a secure backend for authenticated driver updates, and replace sample fleet metadata with verified data. Configure a suitable privacy notice before requesting precise location, and test mobile gestures on both Android and iOS devices.

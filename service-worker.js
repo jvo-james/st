@@ -1,4 +1,4 @@
-const CACHE_NAME = 'knust-shuttle-shell-v4';
+const CACHE_NAME = 'knust-shuttle-shell-v6';
 const SHELL = ['./', './index.html', './styles.css', './script.js', './fallback.js', './campus-fallback.svg', './favicon.svg', './app.webmanifest'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)).catch(() => undefined));
@@ -13,9 +13,19 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
-  event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
-    const copy = response.clone();
-    caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => undefined);
-    return response;
-  }).catch(() => caches.match('./index.html'))));
+  event.respondWith(caches.match(request).then(async cached => {
+    if (cached) return cached;
+    try {
+      const response = await fetch(request);
+      if (response.ok && response.type !== 'opaque') {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => undefined);
+      }
+      return response;
+    } catch (error) {
+      // Only navigation requests may fall back to the application shell; never return HTML for JS/CSS.
+      if (request.mode === 'navigate') return (await caches.match('./index.html')) || Response.error();
+      return Response.error();
+    }
+  }));
 });
