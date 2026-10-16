@@ -1,7 +1,7 @@
 {
   "name": "KNUST Shuttle",
   "short_name": "KNUST Shuttle",
-  "description": "Campus shuttle routes and checkpoint arrivals at KNUST, Kumasi.",
+  "description": "Live-style shuttle locations and arrivals at KNUST, Kumasi.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f7f8f4",

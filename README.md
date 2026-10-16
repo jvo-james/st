@@ -1,10 +1,10 @@
-# KNUST Shuttle
+# KNUST Shuttle Tracker
 
-A mobile-first KNUST campus shuttle tracker with a full-screen ride-hailing map, transparent custom SVG shuttle symbols, scrollable route capsules, checkpoint arrivals, passenger occupancy, driver details, checkpoint timelines, current-location support and checkpoint reminders.
+A phone-first, map-focused shuttle tracker for the KNUST campus. The design keeps the map clear and uses small, elongated, transparent SVG shuttle icons: **green means seats are available; red means the shuttle is full**.
 
-## Run it locally
+## Run locally
 
-For location permission, installability and reliable browser behavior, run it through localhost rather than opening `index.html` directly from File Explorer.
+Use a local web server rather than opening `index.html` directly. This enables browser geolocation and gives the service worker a secure local origin.
 
 **Windows**
 
@@ -18,34 +18,25 @@ py -m http.server 8000
 python3 -m http.server 8000
 ```
 
-Then open <http://localhost:8000>.
+Open <http://localhost:8000> in your browser. Allow location access to show your blue position dot and calculate an estimated arrival time from your location to the selected shuttle.
 
-## Current operating mode
+## Using the map
 
-Without a connected shuttle GPS backend, the app runs on a local vehicle movement model so route selection, bus tracking, checkpoint timelines, ETA changes, occupancy colors and checkpoint alerts can be exercised. The current driver names, registration plates and seat counts are sample records; replace them with verified fleet records before public deployment.
+- The map opens with all shuttles visible and no route lines or checkpoint pins overlaid. Campus landmark labels remain visible as you zoom in.
+- Tap a shuttle to open a compact information sheet with its registration plate, nearby landmark, seat status, location update status and estimated arrival to you.
+- Drag the sheet handle or its header **up** to open the nearby-shuttle list and **down** to collapse it. The collapsed strip stays available so you can pull the sheet up again; no Back button is needed.
+- Tap **Track this shuttle** to zoom toward the selected shuttle and your location (when permission is granted), hide other vehicles and show the selected vehicle's route as a dashed guide. Tap **Stop tracking** to restore the full set of shuttles and clear the route line.
+- If browser GPS is denied or unavailable, the app still shows shuttle movement around campus, but the ETA-to-you field asks you to enable location.
 
-The app attempts to request road-following route geometry from the public OSRM routing service. If that request is unavailable (including when the browser blocks it), it uses its built-in checkpoint-to-checkpoint route geometry. The primary map is CARTO Voyager and includes CARTO / OpenStreetMap attribution. If map tiles are rejected or unavailable, an included campus schematic with interactive markers is used so the screen does not fill with failed tiles. The schematic is an orientation fallback, not a surveyed campus map.
+## Vehicle location feed
 
-## CARTO key
+When no external feed is configured, vehicles move locally along their assigned route so the map, markers, selection sheet and tracking interaction can be exercised. Sample plates, driver names and occupancy values are placeholders and must be replaced with verified fleet data for a real service. The location estimate and arrival time are estimates, not dispatch guarantees.
 
-The supplied CARTO Basemaps key has been added to the client-side tile URL. A key in front-end JavaScript is visible to users by design. Restrict it to your deployed domain in the CARTO dashboard, keep it scoped to this project, and rotate it if needed. See CARTO's Basemaps terms and attribution requirements before a public launch.
-
-## Try checkpoint alerts
-
-1. Open the app from `http://localhost:8000` or HTTPS.
-2. Choose a checkpoint from the map or the expanded panel.
-3. Tap **Alert me** and allow browser notifications if you want an operating-system notification.
-4. Keep the page open. The local feed triggers a reminder when a shuttle enters the 30-metre geofence two checkpoints before the alerted stop on its route.
-
-This client-side reminder is for testing while the page is running. Notifications when the browser is closed require a push-notification service worker subscription and a server that sends push messages; a backend has not been provisioned here.
-
-## Connect a vehicle WebSocket
-
-Pass a WebSocket endpoint as a query parameter, for example:
+To connect a WebSocket server, open the app with a URL such as:
 
 `https://your-domain.example/?feed=wss%3A%2F%2Fyour-api.example%2Fvehicles`
 
-The page accepts one JSON object per message, a JSON array, or an object with a `vehicles` array. Each vehicle record should use the following fields:
+The page accepts one JSON vehicle record per message, an array of records, or an object containing a `vehicles` array. Example record:
 
 ```json
 {
@@ -59,19 +50,21 @@ The page accepts one JSON object per message, a JSON array, or an object with a 
 }
 ```
 
-Vehicle IDs must match the app's known IDs (`K-01` to `K-04`) or the data and IDs must be changed together in `script.js`. Driver devices should emit authorised location updates approximately every three seconds. The server must authenticate driver devices, validate coordinates, rate-limit messages, and publish only authorised fleet data; do not ship a private credential in this front-end project.
+Vehicle IDs must match `K-01` to `K-04` unless you update the fleet records in `script.js`. Driver devices should upload approved coordinates and heading roughly every three seconds. A production backend still needs driver authentication, coordinate validation, authorized fleet data, reliable geofencing, accurate stop/road coordinates, and push notification delivery. Do not place private backend credentials in browser code.
 
-## Checkpoint data
+## Map services and privacy
 
-The checkpoint names and several public mapped coordinates are based on OpenStreetMap / Mapcarta / KNUST public map references. Checkpoints created from a junction or an area rather than a verified bus-stop point are approximate until a campus survey confirms the exact boarding bay. The app uses a 30-metre radius to test local checkpoint arrivals.
+The primary street map uses CARTO Voyager tiles with OpenStreetMap/CARTO attribution. The CARTO basemap key is included in the browser-side tile URL so map tiles can load. Since client-side keys are visible by design, restrict the key to your deployed domain in the CARTO dashboard, keep it scoped to this project, and rotate it if needed. Satellite imagery is intentionally omitted from the simplified interface.
+
+If external map tiles are blocked or unavailable, the app switches to the included campus schematic. It is an orientation fallback, not a surveyed campus map. The public OSRM routing service is used to request road-following route geometry when available; if unavailable, the local route model is used instead. Confirm the precise shuttle paths and boarding areas with KNUST before public launch.
 
 ## Files
 
-- `index.html` — responsive page and Leaflet CDN fallback loader
-- `styles.css` — responsive interface and custom SVG vehicle marker styling
-- `script.js` — local vehicle motion, routes, ETA calculations, geofences, notifications and optional WebSocket telemetry
-- `fallback.js` — loads the local map implementation if Leaflet cannot be loaded
-- `campus-fallback.svg` — included map-tile fallback artwork
+- `index.html` — responsive interface and map-library fallback loader
+- `styles.css` — responsive map-first interface, sheet drag states, and vehicle marker styling
+- `script.js` — shuttle movement, seat status, estimated arrivals, selected-vehicle tracking, location and optional WebSocket feed
+- `fallback.js` — fallback loader if the Leaflet mapping library cannot load
+- `campus-fallback.svg` — campus schematic used when map tiles cannot load
 - `favicon.svg` — app icon
 - `app.webmanifest` — install metadata
-- `service-worker.js` — caches local shell files for repeat visits
+- `service-worker.js` — local application-shell cache

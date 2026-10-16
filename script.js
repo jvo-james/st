@@ -18,26 +18,25 @@
   };
   const busSvg = (status = 'available') => {
     const color = status === 'full' ? COLORS.full : COLORS.available;
-    // Transparent top-down shuttle symbol. Only the vehicle silhouette is drawn.
-    return `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M14.6 3.3h18.8c4.7 0 7.4 3.1 7.4 8.1v25.2c0 4.2-2.3 7.1-6.4 7.1H13.6c-4.1 0-6.4-2.9-6.4-7.1V11.4c0-5 2.7-8.1 7.4-8.1Z" fill="${color}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-      <path d="M13.5 10.2c0-1.8 1.2-3 2.9-3h15.2c1.7 0 2.9 1.2 2.9 3v8.1H13.5v-8.1Z" fill="#153f39"/>
-      <path d="M15 21h18v8.2H15z" fill="#f0f5ee"/>
-      <path d="M15.4 23.4h5.1v3.2h-5.1zM22 23.4h4v3.2h-4zM27.3 23.4h5.1v3.2h-5.1z" fill="${color}" opacity=".38"/>
-      <path d="M14.7 31h18.6m-17.8 3.2h17" stroke="#123c31" stroke-width="1.4" stroke-linecap="round" opacity=".85"/>
-      <path d="M7.7 14.7v5.5m32.6-5.5v5.5M7.7 28.8v5.5m32.6-5.5v5.5" stroke="#263c35" stroke-width="2.7" stroke-linecap="round"/>
-      <path d="M15.5 3.8v2.4m17-2.4v2.4" stroke="#f7fff7" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M12 12.2h1.5m21 0H36" stroke="#d7f6dc" stroke-width="1.4" stroke-linecap="round"/>
+    return `<svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12.5 2.7h15C32.3 2.7 35 6 35 11.2v37.4c0 5.1-2.5 8.7-7.4 8.7h-15C7.7 57.3 5 53.7 5 48.6V11.2C5 6 7.7 2.7 12.5 2.7Z" fill="${color}" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M10.2 11.2c0-2 1.3-3.4 3.2-3.4h13.2c1.9 0 3.2 1.4 3.2 3.4v8.4H10.2v-8.4Z" fill="#14382F"/>
+      <path d="M10.2 22h19.6v14.2H10.2z" fill="#f7fbf6"/>
+      <path d="M12.3 24.3h4.4v4.1h-4.4zM18 24.3h4v4.1h-4zM23.3 24.3h4.3v4.1h-4.3zM12.3 30h4.4v4.1h-4.4zM18 30h4v4.1h-4zM23.3 30h4.3v4.1h-4.3z" fill="${color}" opacity=".38"/>
+      <path d="M10.4 39h19.2m-17.4 4h15.6m-15.6 3.1h15.6" stroke="#11372D" stroke-width="1.5" stroke-linecap="round" opacity=".9"/>
+      <path d="M5.5 15v6m29-6v6M5.5 39v6m29-6v6" stroke="#263D35" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M13 3.8v2.4m14-2.4v2.4" stroke="#f7fff7" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M12.3 52.8h3.2m9 0h3.2" stroke="#e8ffe9" stroke-width="2" stroke-linecap="round"/>
     </svg>`;
   };
   const pinSvg = `<svg viewBox="0 0 32 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 36S3.3 22 3.3 14.8a12.7 12.7 0 1 1 25.4 0C28.7 22 16 36 16 36Z" fill="#fff" stroke="#fff" stroke-width="3"/><path d="M16 34S4.9 21.8 4.9 14.8a11.1 11.1 0 1 1 22.2 0C27.1 21.8 16 34 16 34Z" fill="#2879f6"/><circle cx="16" cy="14.5" r="4.8" fill="#fff"/><circle cx="16" cy="14.5" r="2.1" fill="#2879f6"/></svg>`;
   const buildingSvg = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 9 9-5 9 5M5 10v8m4-8v8m6-8v8m4-8v8M3 20h18M2.5 10h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const searchSvg = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
   const map = window.L ? L.map('map', {
-    zoomControl: false, attributionControl: false, preferCanvas: true,
+    zoomControl: false, attributionControl: true, preferCanvas: true,
     zoomSnap: .25, zoomDelta: .5, minZoom: 12, maxZoom: 19,
     zoomAnimation: true, markerZoomAnimation: true, fadeAnimation: true
-  }).setView(CAMPUS_CENTER, 14.6) : null;
+  }).setView(CAMPUS_CENTER, 15.0) : null;
 
   const STOPS = [
     { id:'conti', name:'Unity Hall (Conti) Roundabout Stop', short:'Conti Roundabout', lat:6.67920, lng:-1.57083, description:'Main interchange beside Unity Hall and Paa Joe Stadium.' },
@@ -84,8 +83,11 @@
   let routeLayers = {}, routeOutlines = {}, routeGeometryReady = false;
   let stopMarkers = {}, stopLabelMarkers = {}, placeMarkers = {}, busMarkers = {};
   let fallbackUserNode = null;
-  let routeVisibility = true;
+  let routeVisibility = false;
   let activeRoute = 'all';
+  let trackingBusId = null;
+  let lastTrackMapTick = 0;
+  let sheetState = 'collapsed';
   let selectedBusId = 'K-01';
   let selectedStopId = null;
   let screenMode = 'home';
@@ -139,8 +141,8 @@
   }
   function stopIconHtml() { return `<div class="stop-pin-marker">${pinSvg}</div>`; }
   function pointIconHtml(place) { return `<div class="map-point-label">${escapeHtml(place.name)}</div>`; }
-  function busDivIcon(bus, selected=false, size=38) {
-    return L.divIcon({ className:'bus-marker-shell', html:busIconHtml(bus,selected), iconSize:[size,size], iconAnchor:[size/2,size/2] });
+  function busDivIcon(bus, selected=false) {
+    return L.divIcon({ className:'bus-marker-shell', html:busIconHtml(bus,selected), iconSize:[25,38], iconAnchor:[12.5,19] });
   }
   function stopDivIcon(size=30) { return L.divIcon({ className:'stop-marker-shell', html:stopIconHtml(), iconSize:[size,size], iconAnchor:[size/2,size-1] }); }
   function stopLabelIcon(stop) { return L.divIcon({className:'stop-label-marker-shell',html:`<div class="stop-name-label">${escapeHtml(stop.short)}</div>`,iconSize:[145,20],iconAnchor:[0,10]}); }
@@ -166,7 +168,7 @@
       satelliteTileErrors++;
       if (activeMapLayer === 'satellite' && satelliteTileErrors >= 7 && satelliteTileLoads === 0) activateMapFallback();
     });
-    map.setView(CAMPUS_CENTER, 14.6);
+    map.setView(CAMPUS_CENTER, 15.0);
     setTimeout(() => { if (!tileLoadCount && tileErrorCount > 1 && !switchedToFallback) activateMapFallback(); }, 6500);
     map.on('zoomend', updatePlaceLabels);
   }
@@ -275,17 +277,17 @@
     Object.values(routeOutlines).forEach(layer=>map.removeLayer(layer));
     routeLayers={}; routeOutlines={};
     Object.values(ROUTES).forEach(route => {
-      const visible=routeVisibility;
-      routeOutlines[route.id]=L.polyline(route.geometry,{color:'#fff',weight:11,opacity:visible?.92:0,interactive:false,lineCap:'round',lineJoin:'round',className:`route-outline route-outline-${route.id}`}).addTo(map);
-      routeLayers[route.id]=L.polyline(route.geometry,{color:route.color,weight:5.5,opacity:visible?.88:0,interactive:true,lineCap:'round',lineJoin:'round',className:`route-line route-${route.id}`}).addTo(map);
-      routeLayers[route.id].on('click',()=>{setActiveRoute(route.id);});
+      routeOutlines[route.id]=L.polyline(route.geometry,{color:'#ffffff',weight:9,opacity:0,interactive:false,lineCap:'round',lineJoin:'round',className:`route-outline route-outline-${route.id}`}).addTo(map);
+      routeLayers[route.id]=L.polyline(route.geometry,{color:route.color,weight:4.5,opacity:0,interactive:false,lineCap:'round',lineJoin:'round',dashArray:'7 10',className:`route-line route-${route.id}`}).addTo(map);
       styleRoute(route.id);
     });
   }
   function styleRoute(routeId) {
-    const route=ROUTES[routeId], selected=activeRoute===routeId;
-    if(routeLayers[routeId]) routeLayers[routeId].setStyle({opacity:routeVisibility?(activeRoute==='all'?.82:(selected?.98:.18)):0,weight:selected?6.5:5.1});
-    if(routeOutlines[routeId]) routeOutlines[routeId].setStyle({opacity:routeVisibility?(activeRoute==='all'?.85:(selected?.95:.30)):0,weight:selected?12:10});
+    const route=ROUTES[routeId];
+    const tracked=trackingBusId ? BUSES.find(bus=>bus.id===trackingBusId) : null;
+    const visible=!!tracked && tracked.routeId===routeId;
+    if(routeLayers[routeId]) routeLayers[routeId].setStyle({opacity:visible?.9:0,weight:visible?4.5:0,dashArray:visible?'7 9':null});
+    if(routeOutlines[routeId]) routeOutlines[routeId].setStyle({opacity:visible?.96:0,weight:visible?8:0});
   }
   function renderRouteVisibility() {
     Object.keys(ROUTES).forEach(styleRoute);
@@ -294,21 +296,18 @@
   function updateFallbackRouteStyles() {
     Object.values(ROUTES).forEach(route=>{
       const pair=fallbackRouteNodes[route.id];if(!pair)return;
-      const active=activeRoute==='all'||activeRoute===route.id;
-      const opacity=!routeVisibility?0:(activeRoute==='all'?.78:(active?.98:.13));
-      pair.outline.setAttribute('opacity',String(!routeVisibility?0:(activeRoute==='all'?.9:(active?.94:.22))));
-      pair.line.setAttribute('opacity',String(opacity));
-      pair.line.setAttribute('stroke-width',activeRoute===route.id?'6.5':'4.5');
+      const tracked=trackingBusId ? BUSES.find(bus=>bus.id===trackingBusId) : null;
+      const visible=!!tracked && tracked.routeId===route.id;
+      pair.outline.setAttribute('opacity',visible?'0.96':'0');
+      pair.line.setAttribute('opacity',visible?'0.92':'0');
+      pair.line.setAttribute('stroke-width',visible?'5':'0');
     });
   }
 
   function addMapMarkers() {
     if(!map) { initLocalFallback(); return; }
-    STOPS.forEach(stop => {
-      const marker=L.marker([stop.lat,stop.lng],{icon:stopDivIcon(),keyboard:true,title:stop.name,riseOnHover:true,zIndexOffset:650});
-      marker.on('click',()=>openStopDetail(stop.id)); marker.addTo(map); stopMarkers[stop.id]=marker;
-      const label=L.marker([stop.lat,stop.lng],{icon:stopLabelIcon(stop),interactive:false,keyboard:false,zIndexOffset:60,opacity:0});label.addTo(map);stopLabelMarkers[stop.id]=label;
-    });
+    // Boarding checkpoints stay in routing/ETA calculations, but their pins are intentionally not drawn.
+    STOPS.forEach(stop => { /* kept as geographic data, not a visual marker */ });
     PLACES.forEach(place=>{
       const marker=L.marker([place.lat,place.lng],{icon:placeDivIcon(place),keyboard:false,interactive:false,zIndexOffset:50,opacity:0});
       marker.addTo(map); placeMarkers[place.id]=marker;
@@ -326,12 +325,8 @@
   function updatePlaceLabels() {
     if(!map) return;
     const zoom=map.getZoom();
-    Object.entries(stopLabelMarkers).forEach(([id,marker])=>{
-      marker.setOpacity(zoom >= 15.15 ? 1 : 0);
-      const el=marker.getElement(); if(el) el.style.pointerEvents='none';
-    });
     Object.entries(placeMarkers).forEach(([id,marker])=>{
-      marker.setOpacity(zoom >= 16.25 ? 1 : 0);
+      marker.setOpacity(zoom >= 14.7 ? 1 : 0);
       const el=marker.getElement(); if(el) el.style.pointerEvents='none';
     });
   }
@@ -367,7 +362,7 @@
     const pos=currentBusPosition(bus,now);
     bus.currentLatLng={lat:pos.lat,lng:pos.lng}; bus.heading=pos.heading;
     if(!bus.marker){
-      if(!map && fallbackProject){const node=fallbackBusNodes[bus.id];if(node){const [x,y]=fallbackProject(pos.lat,pos.lng);node.setAttribute('transform',`translate(${x} ${y}) rotate(${pos.heading}) scale(.72)`);node.setAttribute('opacity',activeRoute==='all'||bus.routeId===activeRoute?'1':'.16');}}
+      if(!map && fallbackProject){const node=fallbackBusNodes[bus.id];if(node){const [x,y]=fallbackProject(pos.lat,pos.lng);node.setAttribute('transform',`translate(${x} ${y}) rotate(${pos.heading}) scale(.55)`);node.setAttribute('opacity',!trackingBusId||bus.id===trackingBusId?'1':'0');node.style.pointerEvents=!trackingBusId||bus.id===trackingBusId?'auto':'none';}}
       return;
     }
     bus.marker.setLatLng([pos.lat,pos.lng]);
@@ -378,8 +373,9 @@
     }
     const el=bus.marker.getElement();
     if(el){const inner=el.querySelector('.bus-marker');if(inner){inner.style.setProperty('--heading',`${pos.heading}deg`);inner.classList.toggle('is-selected',selected);}}
-    const shown=activeRoute==='all'||bus.routeId===activeRoute;
-    bus.marker.setOpacity(shown?1:0.14);
+    const shown=!trackingBusId||bus.id===trackingBusId;
+    bus.marker.setOpacity(shown?1:0);
+    if(el) el.style.pointerEvents=shown?'auto':'none';
     if(force) bus.marker.update();
   }
   function nextStopInfo(bus, now=performance.now()) {
@@ -437,7 +433,9 @@
       </button>`;
     }).join('');
     list.querySelectorAll('[data-open-bus]').forEach(btn=>btn.addEventListener('click',()=>openBusDetail(btn.dataset.openBus)));
-    $('#mapActivity').textContent=`${BUSES.filter(b=>b.external&&Date.now()-b.telemetryAt<12000).length||BUSES.length} shuttles on the move`;
+    $('#mapActivity').textContent=`${BUSES.length} shuttles on the map`;
+    if($('#shuttleCountSummary')) $('#shuttleCountSummary').textContent=`${BUSES.length} shuttles on the map`;
+    if($('#seatCountSummary')) $('#seatCountSummary').textContent=`${BUSES.filter(b=>busStatus(b)!=='full').length} with seats`;
   }
   function renderQuickCheckpoints() {
     $('#quickCheckpoints').innerHTML=STOPS.map(stop=>`<button type="button" class="quick-checkpoint" data-open-stop="${stop.id}">${escapeHtml(stop.short)}</button>`).join('');
@@ -449,6 +447,8 @@
     let nearest=STOPS[0],dist=Infinity;
     STOPS.forEach(stop=>{const d=haversine(from,[stop.lat,stop.lng]);if(d<dist){dist=d;nearest=stop;}});
     lastNearestId=nearest.id;
+    if($('#shuttleCountSummary')) $('#shuttleCountSummary').textContent=`${BUSES.length} shuttles on the map`;
+    if($('#seatCountSummary')) $('#seatCountSummary').textContent=`${BUSES.filter(b=>busStatus(b)!=='full').length} with seats`;
     $('#nearestStopName').textContent=nearest.short;
     $('#nearestDistance').textContent=userLatLng?distanceLabel(dist):'Campus centre · enable location for a closer match';
     const candidates=BUSES.map(bus=>({bus,eta:etaToStop(bus,nearest.id)})).filter(x=>Number.isFinite(x.eta)).sort((a,b)=>a.eta-b.eta);
@@ -534,18 +534,38 @@
     $('#busDetailView').hidden=false;$('#stopDetailView').hidden=true;
     $('#detailEyebrow').textContent='SHUTTLE DETAILS';
     $('#detailTitle').textContent=bus.name;
-    $('#detailSubtitle').textContent=`${routeOf(bus).name} · ${routeOf(bus).stopOrder.length} checkpoints`;
+    $('#detailSubtitle').textContent='Location updates automatically';
     $('#detailBell').style.visibility='hidden';
     updateSelectionVisuals();renderBusDetail();
-    $('#bottomSheet').classList.add('is-detail');$('#bottomSheet').classList.remove('is-expanded');
-    $('#sheetHandle').setAttribute('aria-expanded','true');
-    const p=bus.currentLatLng||currentBusPosition(bus);if(map)map.panTo([p.lat,p.lng],{animate:true,duration:.45});else focusFallbackAt(p.lat,p.lng,390);
+    setSheetState('detail');
+    const p=bus.currentLatLng||currentBusPosition(bus);if(map)map.panTo([p.lat,p.lng],{animate:true,duration:.35});else focusFallbackAt(p.lat,p.lng,420);
   }
+  function nearestMappedPlace(lat,lng) {
+    const all=[...PLACES.map(place=>({name:place.name,lat:place.lat,lng:place.lng})),...STOPS.map(stop=>({name:stop.short,lat:stop.lat,lng:stop.lng}))];
+    let best=all[0],dBest=Infinity;
+    all.forEach(item=>{const d=haversine([lat,lng],[item.lat,item.lng]);if(d<dBest){dBest=d;best=item;}});
+    return {name:best.name,distance:dBest};
+  }
+  function etaFromBusToUser(bus) {
+    if(!userLatLng)return null;
+    const pos=bus.currentLatLng||currentBusPosition(bus);
+    const meters=haversine([pos.lat,pos.lng],[userLatLng.lat,userLatLng.lng]);
+    // Campus-speed estimate, with a road-distance allowance over straight-line distance.
+    return Math.max(1,Math.round((meters*1.28)/250));
+  }
+
   function renderBusDetail() {
     const bus=BUSES.find(b=>b.id===selectedBusId);if(!bus)return;
     const route=routeOf(bus),status=busStatus(bus),free=freeSeats(bus),next=nextStopInfo(bus);
     $('#detailBusIcon').innerHTML=busSvg(status);
     $('#detailBusName').textContent=bus.name;$('#detailBusPlate').textContent=bus.plate;
+    $('#quickVehiclePlate').textContent=bus.plate;
+    const pos=bus.currentLatLng||currentBusPosition(bus),near=nearestMappedPlace(pos.lat,pos.lng);
+    $('#busLiveLocation').textContent=near.distance<500?`Near ${near.name}`:`Around ${near.name}`;
+    const userEta=etaFromBusToUser(bus);$('#busEtaToYou').textContent=userEta===null?'Enable location':`${userEta} min away`;
+    $('#busFeedStatus').textContent=bus.external&&Date.now()-bus.telemetryAt<12000?'Location connected':'Location updating';
+    $('#centerSelected').innerHTML=(trackingBusId===bus.id?'Stop tracking':'Track this shuttle')+' <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3m0 15v3m-10.5-10.5h3m15 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+    $('#centerSelected').classList.toggle('is-active',trackingBusId===bus.id);
     $('#seatStatus').classList.toggle('is-full',status==='full');
     $('#seatStatus').innerHTML=`<i></i><span>${status==='full'?'Full shuttle':'Seats available'}</span>`;
     $('#occupancyLabel').textContent=`${bus.occupancy} of ${bus.capacity} seats`;
@@ -585,32 +605,78 @@
   function closeDetail() {
     screenMode='home';selectedStopId=null;
     $('#sheetHome').hidden=false;$('#sheetDetail').hidden=true;
-    $('#bottomSheet').classList.remove('is-detail','is-expanded');
-    $('#sheetHandle').setAttribute('aria-expanded','false');
+    setSheetState('collapsed');
     updateSelectionVisuals();findNearestStop();
   }
   let suppressSheetClick = false;
-  function setSheetExpanded(expanded) {
-    $('#bottomSheet').classList.toggle('is-expanded', expanded);
-    $('#sheetHandle').setAttribute('aria-expanded',String(expanded));
-    if(expanded && screenMode==='home') renderHomeBusList();
+  function setSheetState(state) {
+    const sheet=$('#bottomSheet');
+    sheetState=state;
+    sheet.classList.toggle('is-collapsed',state==='collapsed');
+    sheet.classList.toggle('is-raised',state==='raised');
+    sheet.classList.toggle('is-detail',state==='detail');
+    sheet.classList.toggle('is-expanded',state==='expanded');
+    sheet.style.height='';sheet.style.transition='';
+    $('#sheetHandle').setAttribute('aria-expanded',String(state!=='collapsed'));
+    $('#sheetHandle').setAttribute('aria-label',state==='collapsed'?'Open nearby shuttles':'Swipe down to collapse, swipe up to expand');
+    if(state==='raised'||state==='expanded') renderHomeBusList();
+    if(state==='detail' && screenMode==='bus') renderBusDetail();
+    if(map) setTimeout(()=>map.invalidateSize({pan:false}),300);
   }
+  function setSheetExpanded(expanded) { setSheetState(expanded?'expanded':'collapsed'); }
   function toggleSheet() {
     if (suppressSheetClick) { suppressSheetClick = false; return; }
-    setSheetExpanded(!$('#bottomSheet').classList.contains('is-expanded'));
+    if(sheetState==='collapsed') setSheetState(screenMode==='bus'?'detail':'raised');
+    else if(sheetState==='raised') setSheetState('expanded');
+    else setSheetState('collapsed');
   }
   function bindSheetSwipe() {
-    const handle=$('#sheetHandle'); let startY=null;
-    handle.addEventListener('pointerdown',event=>{startY=event.clientY;try{handle.setPointerCapture(event.pointerId);}catch(e){}},{passive:true});
-    handle.addEventListener('pointerup',event=>{
-      if(startY===null)return;
-      const delta=startY-event.clientY;startY=null;
-      if(Math.abs(delta)<28)return;
-      suppressSheetClick=true;
-      setSheetExpanded(delta>0);
-      window.setTimeout(()=>{suppressSheetClick=false;},450);
+    const sheet=$('#bottomSheet');
+    let startY=null,startHeight=0,lastY=0,lastTime=0,dragging=false;
+    const dragOrigins='.sheet-grab-area,.sheet-collapsed-summary,.nearest-row,.next-arrival-line,.detail-header,.bus-identity-row,.bus-quick-facts,.bus-action-row';
+    sheet.addEventListener('pointerdown',event=>{
+      if(!event.target.closest(dragOrigins)) return;
+      if(event.target.closest('button') && !event.target.closest('#sheetHandle')) return;
+      startY=event.clientY;lastY=startY;lastTime=performance.now();startHeight=sheet.getBoundingClientRect().height;dragging=true;
+      sheet.style.transition='none';
+      try{sheet.setPointerCapture(event.pointerId);}catch(e){}
     });
-    handle.addEventListener('pointercancel',()=>{startY=null;});
+    sheet.addEventListener('pointermove',event=>{
+      if(!dragging||startY===null)return;
+      const dy=startY-event.clientY;
+      const maxHeight=Math.max(240,window.innerHeight-(parseFloat(getComputedStyle(sheet).bottom)||0)-20);
+      const next=Math.max(52,Math.min(maxHeight,startHeight+dy));
+      sheet.style.height=`${next}px`;
+      lastY=event.clientY;lastTime=performance.now();
+      if(Math.abs(dy)>5)event.preventDefault();
+    });
+    const finish=event=>{
+      if(!dragging||startY===null)return;
+      const dy=startY-event.clientY,current=sheet.getBoundingClientRect().height;
+      const velocity=(event.clientY-lastY)/Math.max(1,performance.now()-lastTime);
+      dragging=false;startY=null;sheet.style.transition='';
+      if(Math.abs(dy)<14 && Math.abs(velocity)<.25){sheet.style.height='';return;}
+      suppressSheetClick=true;
+      if(dy>45||velocity<-.45){
+        if(sheetState==='collapsed')setSheetState(screenMode==='bus'?'detail':'raised');
+        else if(sheetState==='raised')setSheetState('expanded');
+        else if(sheetState==='detail')setSheetState('detail');
+        else setSheetState('expanded');
+      } else if(dy< -45||velocity>.45){
+        if(sheetState==='expanded')setSheetState(screenMode==='bus'?'detail':'raised');
+        else setSheetState('collapsed');
+      } else {
+        // A drag that didn't cross a snap threshold returns to its nearest intended state.
+        const collapsedThreshold=88,expandedThreshold=Math.min(window.innerHeight*.62,500);
+        if(current<collapsedThreshold)setSheetState('collapsed');
+        else if(current>expandedThreshold)setSheetState('expanded');
+        else if(screenMode==='bus')setSheetState('detail');else setSheetState('raised');
+      }
+      window.setTimeout(()=>{suppressSheetClick=false;},250);
+    };
+    sheet.addEventListener('pointerup',finish);sheet.addEventListener('pointercancel',finish);
+    // Short click/tap on the grab handle still toggles naturally.
+    $('#sheetHandle').addEventListener('click',toggleSheet);
   }
 
   function updateLocation(lat,lng,accuracy=20) {
@@ -640,9 +706,34 @@
   }
   function centerSelected() {
     const bus=BUSES.find(b=>b.id===selectedBusId);if(!bus)return;
+    if(trackingBusId===bus.id){
+      trackingBusId=null;routeVisibility=false;followingUser=false;
+      Object.keys(ROUTES).forEach(styleRoute);updateFallbackRouteStyles();
+      BUSES.forEach(vehicle=>updateBusPosition(vehicle,performance.now(),true));
+      setSheetState('detail');renderBusDetail();
+      if(map)map.setView(CAMPUS_CENTER,15,{animate:true});
+      showToast('Showing all nearby shuttles');return;
+    }
+    trackingBusId=bus.id;routeVisibility=true;followingUser=false;
+    Object.keys(ROUTES).forEach(styleRoute);updateFallbackRouteStyles();
+    BUSES.forEach(vehicle=>updateBusPosition(vehicle,performance.now(),true));
+    renderBusDetail();setSheetState('detail');
+    focusTrackedVehicles(true);lastTrackMapTick=performance.now();
+    showToast(`Tracking ${bus.name}`);
+  }
+  function focusTrackedVehicles(animate=false) {
+    if(!trackingBusId)return;
+    const bus=BUSES.find(item=>item.id===trackingBusId);if(!bus)return;
     const p=bus.currentLatLng||currentBusPosition(bus);
-    if(map)map.setView([p.lat,p.lng],Math.max(map.getZoom(),16),{animate:true});else focusFallbackAt(p.lat,p.lng,360);
-    followingUser=false;showToast(`Following ${bus.name}`);
+    if(map){
+      if(userLatLng){
+        const bounds=L.latLngBounds([[p.lat,p.lng],[userLatLng.lat,userLatLng.lng]]);
+        map.fitBounds(bounds,{paddingTopLeft:[28,42],paddingBottomRight:[28,window.innerWidth<=760?255:75],maxZoom:16.4,animate});
+      } else map.setView([p.lat,p.lng],Math.max(map.getZoom(),16.2),{animate});
+    } else if(fallbackSvg){
+      if(userLatLng)fitFallbackToPoints([[p.lat,p.lng],[userLatLng.lat,userLatLng.lng]]);
+      else focusFallbackAt(p.lat,p.lng,390);
+    }
   }
 
   async function toggleAlert(stopId) {
@@ -703,6 +794,7 @@
   }
   function animationFrame(now) {
     BUSES.forEach(bus=>updateBusPosition(bus,now));
+    if(trackingBusId && now-lastTrackMapTick>1800){focusTrackedVehicles(false);lastTrackMapTick=now;}
     if(!lastTelemetryUpdate || now-lastTelemetryUpdate>=TELEMETRY_INTERVAL) updateTelemetry(now);
     requestAnimationFrame(animationFrame);
   }
@@ -769,8 +861,8 @@
       const points=route.geometry.map(([lat,lng])=>point(lat,lng).join(',')).join(' ');
       return `<g data-fallback-route="${route.id}"><polyline class="fallback-route-outline" points="${points}"/><polyline class="fallback-route-line" data-fallback-route-line="${route.id}" points="${points}" stroke="${route.color}"/></g>`;
     }).join('');
-    const stopSvg=STOPS.map(stop=>{const [x,y]=point(stop.lat,stop.lng);return `<g class="local-fallback-stop" data-open-stop="${stop.id}" transform="translate(${x} ${y})" role="button" tabindex="0" aria-label="${escapeHtml(stop.name)}"><circle r="9"/><circle r="3" fill="#2879f6" stroke="none"/><title>${escapeHtml(stop.name)}</title></g>`;}).join('');
-    const busGroup=BUSES.map(bus=>{const pos=currentBusPosition(bus,performance.now());const [x,y]=point(pos.lat,pos.lng);return `<g class="local-fallback-bus" data-open-bus="${bus.id}" data-bus-pos="${bus.id}" transform="translate(${x} ${y}) rotate(${pos.heading}) scale(.72)" role="button" tabindex="0" aria-label="${escapeHtml(bus.name)}">${busSvg(busStatus(bus)).replace('<svg viewBox="0 0 48 48"','<svg x="-24" y="-24" width="48" height="48" viewBox="0 0 48 48"')}<title>${escapeHtml(bus.name)}</title></g>`;}).join('');
+    const stopSvg='';
+    const busGroup=BUSES.map(bus=>{const pos=currentBusPosition(bus,performance.now());const [x,y]=point(pos.lat,pos.lng);return `<g class="local-fallback-bus" data-open-bus="${bus.id}" data-bus-pos="${bus.id}" transform="translate(${x} ${y}) rotate(${pos.heading}) scale(.55)" role="button" tabindex="0" aria-label="${escapeHtml(bus.name)}">${busSvg(busStatus(bus)).replace('<svg viewBox="0 0 40 60"','<svg x="-20" y="-30" width="40" height="60" viewBox="0 0 40 60"')}<title>${escapeHtml(bus.name)}</title></g>`;}).join('');
     const [ux,uy]=point(CAMPUS_CENTER[0],CAMPUS_CENTER[1]);
     fallbackProject=point;
     holder.innerHTML=`<svg id="fallbackSvg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid slice" role="application" aria-label="Interactive schematic map of KNUST"><image href="campus-fallback.svg" x="0" y="0" width="${width}" height="${height}" preserveAspectRatio="none"/><g class="fallback-route-layer">${routeSvg}</g><g class="fallback-shuttle-layer">${stopSvg}${busGroup}<g id="fallbackUserMarker" opacity="0" transform="translate(${ux} ${uy})"><circle class="fallback-user-pulse" r="18" fill="#2879f6" opacity=".18"/><circle r="10" fill="#fff"/><circle r="7" fill="#2879f6" stroke="#fff" stroke-width="2"/></g></g></svg>`;
@@ -810,22 +902,22 @@
   }
 
   function bindEvents() {
-    $$('#routeChips [data-route]').forEach(btn=>btn.addEventListener('click',()=>setActiveRoute(btn.dataset.route,true)));
-    $('#routeLayerToggle').addEventListener('click',()=>{routeVisibility=!routeVisibility;$('#routeLayerToggle').setAttribute('aria-pressed',String(routeVisibility));renderRouteVisibility();showToast(routeVisibility?'Routes shown':'Routes hidden');});
-    $('#mapStyleToggle').addEventListener('click',switchMapStyle);
+    // Map gestures are intentionally uncluttered; native trackpad/touch zoom remains available.
     $('#zoomIn').addEventListener('click',()=>map?map.zoomIn():zoomFallback(.78));$('#zoomOut').addEventListener('click',()=>map?map.zoomOut():zoomFallback(1.28));
-    $('#fitCampus').addEventListener('click',()=>focusRoute('all',true));
-    $('#locateButton').addEventListener('click',()=>requestLocation(true));$('#locateTop').addEventListener('click',()=>requestLocation(true));
+    $('#fitCampus').addEventListener('click',()=>{if(map)map.setView(CAMPUS_CENTER,15,{animate:true});else focusFallbackAt(CAMPUS_CENTER[0],CAMPUS_CENTER[1],620);});
+    $('#locateButton').addEventListener('click',()=>requestLocation(true));
     $('#nearestBell').addEventListener('click',()=>toggleAlert(lastNearestId));
-    $('#sheetHandle').addEventListener('click',toggleSheet);bindSheetSwipe();
+    bindSheetSwipe();
     $('#detailBack').addEventListener('click',closeDetail);
     $('#centerSelected').addEventListener('click',centerSelected);
+    $('#locateTop').addEventListener('click',()=>requestLocation(true));
     $('#detailBell').addEventListener('click',()=>toggleAlert(selectedStopId));
     $('#stopAlertButton').addEventListener('click',()=>toggleAlert(selectedStopId));
-    $('#viewAllBuses').addEventListener('click',()=>{$('#bottomSheet').classList.add('is-expanded');$('#sheetHandle').setAttribute('aria-expanded','true');});
-    $('#searchToggle').addEventListener('click',()=>toggleSearch());$('#searchClose').addEventListener('click',()=>toggleSearch(false));
+    $('#viewAllBuses').addEventListener('click',()=>setSheetState('expanded'));
+    const searchToggle=$('#searchToggle');if(searchToggle)searchToggle.addEventListener('click',()=>toggleSearch());
+    $('#searchClose').addEventListener('click',()=>toggleSearch(false));
     $('#globalSearch').addEventListener('input',e=>renderSearchResults(e.target.value));
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'){toggleSearch(false);$('#helpDialog').hidden=true;if(screenMode!=='home')closeDetail();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();toggleSearch(true);}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#helpDialog').hidden=true;if(screenMode!=='home')closeDetail();}});
     initHelp();
   }
 
@@ -836,11 +928,11 @@
     if(map){
       // Route geometry first uses the road network; if online routing is unavailable,
       // checkpoint-to-checkpoint lines remain interactive and vehicle movement still works.
-      drawRouteLayers();addMapMarkers();focusRoute('all',false);
+      drawRouteLayers();addMapMarkers();
       loadRoadGeometry().then(()=>{drawRouteLayers();BusesReposition();}).catch(()=>{});
       function BusesReposition(){BUSES.forEach(bus=>updateBusPosition(bus,performance.now(),true));}
     } else initLocalFallback();
-    bindEvents();renderQuickCheckpoints();findNearestStop();
+    bindEvents();renderQuickCheckpoints();findNearestStop();setSheetState('collapsed');
     connectExternalFeed();
     const clock=()=>{const now=new Date();$('#lastUpdate').textContent='Updated just now';};clock();setInterval(clock,3000);
     if(navigator.geolocation){setTimeout(()=>requestLocation(false,true),1200);}
