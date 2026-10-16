@@ -1,4 +1,4 @@
-const CACHE_NAME = 'knust-shuttle-shell-v6';
+const CACHE_NAME = 'knust-shuttle-shell-v12';
 const SHELL = ['./', './index.html', './styles.css', './script.js', './fallback.js', './campus-fallback.svg', './favicon.svg', './app.webmanifest'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)).catch(() => undefined));

@@ -61,6 +61,15 @@
           </div>
           <div class="next-arrival-line"><span class="arrival-route-swatch" id="nearestRouteSwatch"></span><p id="nearestMessage">Find a shuttle heading to your next stop.</p><button id="nearestBell" class="tiny-bell" type="button" aria-label="Notify me about this checkpoint" title="Notify me about this checkpoint"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
           <div class="sheet-expanded-content" id="homeExpandedContent">
+            <section class="trip-planner" aria-labelledby="tripPlannerTitle">
+              <div class="trip-planner-heading"><div><span class="section-kicker">PLAN A CAMPUS TRIP</span><h3 id="tripPlannerTitle">Where are you going?</h3></div><span class="trip-planner-route-icon" aria-hidden="true">↗</span></div>
+              <div class="trip-fields">
+                <label><span>Pickup stop</span><select id="tripPickup" aria-label="Pickup checkpoint"></select></label>
+                <label><span>Destination</span><select id="tripDestination" aria-label="Destination checkpoint"></select></label>
+              </div>
+              <button class="primary-action full-width trip-plan-button" id="planTrip" type="button">Find suitable shuttles <span aria-hidden="true">→</span></button>
+              <p id="tripPlanNote" class="trip-plan-note">We match the pickup and destination against each shuttle's checkpoint order and direction.</p>
+            </section>
             <div class="sheet-section-heading"><div><span class="section-kicker">ON THE MOVE</span><h3>Nearby shuttles</h3></div><button id="viewAllBuses" class="text-action" type="button">View all <span>↗</span></button></div>
             <div id="homeBusList" class="home-bus-list"></div>
             <div class="sheet-section-heading checkpoints-heading"><div><span class="section-kicker">AROUND KNUST</span><h3>Popular checkpoints</h3></div></div>
@@ -110,7 +119,7 @@
       <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </main>
   </div>
-  <div id="helpDialog" class="modal-backdrop" hidden><section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="helpClose" class="dialog-close" type="button" aria-label="Close help">×</button><span class="section-kicker">KNUST SHUTTLE</span><h2 id="helpTitle">Your campus, connected.</h2><p>See available shuttles on the map. Tap any vehicle for its location, seat availability and estimated arrival to you. Allow location access to show your blue position dot and personalise arrival estimates. Choose Track this shuttle to focus on one vehicle.</p><div class="help-key"><span><i class="key-dot available"></i>Seats available</span><span><i class="key-dot full"></i>Full shuttle</span><span><i class="key-user"></i>Your location</span></div><button class="primary-action full-width" id="helpDone" type="button">Got it</button></section></div>
+  <div id="helpDialog" class="modal-backdrop" hidden><section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="helpClose" class="dialog-close" type="button" aria-label="Close help">×</button><span class="section-kicker">KNUST SHUTTLE</span><h2 id="helpTitle">Your campus, connected.</h2><p>See all shuttles on the map. Tap any vehicle to highlight its service route and see its checkpoint order, seat availability and estimated pickup time. Allow location access to show your blue position dot. Use Follow shuttle when you want the camera to follow a vehicle; you can always drag or zoom the map yourself.</p><div class="help-key"><span><i class="key-dot available"></i>Seats available</span><span><i class="key-dot full"></i>Full shuttle</span><span><i class="key-user"></i>Your location</span></div><button class="primary-action full-width" id="helpDone" type="button">Got it</button></section></div>
   <div id="appNotice" class="app-notice" hidden></div>
 
   <script>

@@ -1,42 +1,93 @@
 # KNUST Shuttle Tracker
 
-A mobile-first campus shuttle tracking prototype built with HTML, CSS, vanilla JavaScript and Leaflet. It includes a map-first interface, directional shuttle markers, a draggable ride sheet, route highlighting, arrival estimates, checkpoint search and a simulated route-motion model so the interface can be exercised without a live fleet feed.
+A mobile-first campus shuttle tracking prototype built with HTML, CSS, vanilla JavaScript and Leaflet. It includes a light campus map, slim top-down shuttle markers, smooth route movement, a swipeable ride sheet, checkpoint search and direction-aware trip planning.
 
 ## Run locally
 
-Use a local web server rather than opening `index.html` with `file://` so the browser can load the map library and register the service worker.
+Use a local web server rather than opening `index.html` with `file://` so the browser can load Leaflet and register the service worker.
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000>.
+Then open <http://localhost:8000>. VS Code Live Server also works. Location-based features require a secure browser context such as `localhost` or HTTPS.
 
-You can also use the VS Code **Live Server** extension. The map requires an internet connection unless the bundled campus schematic fallback is active. Location-based features require a secure context such as `localhost` or HTTPS.
+## Route and checkpoint model
 
-## Interface updates
+Each shuttle service has a separate ordered outbound pattern and return pattern. The planner evaluates future checkpoint visits in that order instead of treating every bus as suitable merely because it is nearby.
 
-- **Light campus basemap:** CARTO Voyager raster tiles through Leaflet. The CARTO Basemaps API key is configured in `script.js`; because browser keys are visible to visitors, restrict the key to your development/deployment hostnames in the CARTO Basemaps dashboard. Keep the OpenStreetMap and CARTO attribution visible. Usage allowances and terms depend on your CARTO account and project type; do not assume this public endpoint is guaranteed production hosting.
-- **Slim, directional shuttle marker:** a narrow top-down SVG with a north-facing base orientation. Its vehicle art rotates along the route bearing, while the ETA bubble stays upright.
-- **Route-to-pickup highlight:** selecting a shuttle opens the ride sheet and highlights its approach to the next checkpoint. When device location is available, the app attempts to request road geometry from the public OSRM demo service to the user's location. The fallback joins the shuttle's route to its next checkpoint and estimates the remaining distance.
-- **Smooth movement:** simulated vehicles move continuously along route geometry, and the heading uses a short look-ahead around corners. When a WebSocket feed is configured, external GPS fixes are interpolated over a short interval rather than applied as abrupt jumps.
-- **Swipeable bottom sheet:** drag the summary/header/hero area up or down to snap between collapsed, shuttle-detail and expanded states. Controls keep their normal click behaviour, and the scrollable list/detail content can still scroll.
-- **Search and location controls:** search shuttles, checkpoints and landmarks, center the map, request device location and browse nearby services.
-- **Offline fallback:** if the map library cannot load, the bundled campus schematic still provides a lightweight visual prototype. This is approximate geometry, not a verified campus road map.
+### Service patterns encoded from the project owner's route information
 
-## Current prototype data and limitations
+**Commercial Area ↔ KSB**
 
-Shuttle IDs, route loops, passenger counts, drivers, plates, checkpoints and ETAs are sample values used for interface testing. Confirm checkpoint coordinates and route geometry against actual KNUST operations before using the app for travel decisions.
+- Towards KSB: Commercial Area → Conti Bus Stop → College of Science Bus Stop → KSB
+- Towards Commercial Area: KSB → Casely Hayford Bus Stop → Conti Bus Stop → Commercial Area
 
-Road routing is attempted through `https://router.project-osrm.org`, a public demonstration service. It can be rate-limited, unavailable, or return imperfect campus routing. The fallback is intentionally visual and should not be treated as turn-by-turn navigation. CARTO's public tile endpoints and OSRM's demo endpoint are not a substitute for a production map/routing agreement if usage grows.
+**Brunei ↔ KSB**
 
-The app optionally accepts a WebSocket URL through the `feed` query parameter:
+- Towards KSB: Brunei → Prempeh Library → College of Science Bus Stop → KSB
+- Towards Brunei: KSB → Casely Hayford Bus Stop → Prempeh Library → Brunei
+
+**College of Science ↔ Gaza**
+
+- The prototype currently models College of Science ↔ Gaza as an endpoint-only provisional service. Publicly mapped campus stops are available as candidate map pins, but no intermediate checkpoints have been assigned without confirmation from campus shuttle operators.
+
+**Brunei ↔ Medical Village**
+
+- Included as a provisional endpoint-only service because public reporting has mentioned a connection between Brunei and Medical Village. The app does **not** claim to know the official intermediate stops, timetable, or final operating pattern.
+
+The sample fleet assigns demo vehicles to these services for interface testing. Bus IDs, positions, occupancy, driver details, route cycle times and all displayed ETAs are mock values, not live operational data.
+
+## Route-aware trip planning
+
+Expand the bottom sheet and use **Where are you going?** to choose pickup and destination checkpoints. The app only returns sample vehicles whose configured ordered stop pattern can carry the student from that pickup to that destination in a single service pattern. A nearby vehicle on a route that does not serve the trip is not treated as a valid direct option. If no configured service matches, the app says so rather than inventing a route.
+
+The ETA is a prototype estimate based on a configured service-cycle duration and progress along the route. It is not based on measured campus traffic or a production timetable. Terminal dwell time, queues, driver decisions, temporary diversions and stop-level waiting rules still need field research before operational use.
+
+## Campus stop coordinates and source confidence
+
+The route order for Commercial Area–KSB and Brunei–KSB comes from the project owner. Stop coordinates are a separate matter: most have not been surveyed to the exact bus bay. A public KNUST campus bus-stop mapping project identifies names including Pentecoste, Casely Hayford, CCB, Steps, KSB, Ahinsan, Brunei and Bomso Gate. Official KNUST materials describe shuttles serving halls/residential areas, academic areas and the commercial area. Public reporting in June 2026 also mentioned a Brunei–Medical Village connection. These references support candidate checkpoint discovery, but they do not confirm the full route sequence, exact boarding position, or live service status.
+
+- Checkpoints explicitly provided by the project owner are used in the confirmed route patterns.
+- Other named campus stops and places are marked as approximate/candidate pins in the interface.
+- Prempeh II Library and KSB coordinates are sourced from public map references, but are not a surveyed measurement of the exact shuttle bay.
+- Gaza, Medical Village and other candidate pins are approximate. They must be checked with campus transport staff or by walking the campus before public use.
+- No route sequence has been inferred for a stop simply because that stop appears on the map.
+
+References used for initial discovery:
+
+- KNUST campus bus-stop mapping: <https://storymaps.arcgis.com/stories/70f704c487ca4878b4e2bd543e158f51>
+- KNUST official transportation guide: <https://www.knust.edu.gh/index.php/admissions/freshers-guide/transportation>
+- KNUST official naming of roads and facilities (includes Gaza / campus road references): <https://www.knust.edu.gh/staff/naming-of-university-facilities>
+- Public reporting on the Brunei–Medical Village connection: <https://unexgh.com/uninews/NewsDetails/605>
+
+## Smooth map and marker behaviour
+
+- **CARTO Voyager raster tiles:** the CARTO Basemaps key is configured in `script.js`. Browser keys are public by design; restrict the key to your development/deployment hostnames in the CARTO dashboard. Keep CARTO and OpenStreetMap attribution visible and follow your account's current terms and usage limits.
+- **Stable panning and zooming:** tiles are buffered and refreshed after map gestures settle; no CSS filter is applied to the tile pane. Zoom controls and a fit-checkpoints control remain available. Camera follow is disabled by default and automatically pauses during user map gestures. Expensive approach-route geometry is not re-created every animation frame, and road geometry is applied in a single batch rather than arriving route by route.
+- **User-controlled map camera:** selecting a shuttle fits the fleet and selected approach route once, then leaves the camera where the user puts it. Camera-follow is opt-in using **Follow shuttle**. Panning, wheel zoom and pinch zoom always suspend follow until the button is pressed again.
+- **All shuttles remain visible:** selecting a vehicle raises/highlights it but does not hide other bus markers. Bus markers are sized for visibility and tinted by service route, with no outer marker border; all fleet icons remain visible unless actual map overlap obscures one.
+- **Slim top-down vehicle:** the SVG marker has no outer selection frame. Its nose rotates to the route bearing; text labels stay upright.
+- **Smooth movement:** simulated vehicles use continuous `requestAnimationFrame` positioning, a short route look-ahead for turning, and eased migration when road-snapped geometry arrives. ETA text is refreshed less often than positions to avoid unnecessary layout work.
+- **Route-to-pickup line:** selecting a shuttle draws a highlighted approach line. The pickup/destination planner highlights the selected bus's future path to the next valid pickup occurrence in the selected service pattern.
+- **Swipeable bottom sheet:** swipe upward/downward on the sheet header and non-control ride-card surfaces to switch between collapsed, detail and expanded states. The handle responds to one tap, pointer/touch swipes continue beyond the original touch target, and expanded lists retain native vertical scrolling.
+- **Offline fallback:** if Leaflet cannot load, a bundled schematic campus map provides a lightweight visual fallback. It is not a verified street map.
+
+## Map and routing service limitations
+
+The map uses CARTO Voyager tiles. CARTO key requirements, pricing/usage allowances and restrictions can change; check your account terms and restrict the browser key to your own domains. The road geometry is requested from the public OSRM demo service (`https://router.project-osrm.org`). That server is shared, can be rate-limited or unavailable, and is not a production-service guarantee. When it cannot provide road geometry, the prototype falls back to straight checkpoint-to-checkpoint geometry so the interface remains usable.
+
+If the app grows beyond personal prototyping, use a contracted map/routing provider or operate an appropriately licensed routing service. Verify map attribution and licensing before deployment.
+
+## Optional vehicle feed
+
+The app can consume a WebSocket feed when a `feed` query parameter is provided:
 
 ```text
 https://your-host/knust-shuttle/?feed=wss://your-service.example/vehicles
 ```
 
-Each message can be one vehicle record, an array of records, or an object with a `vehicles` array. Vehicle records use this shape:
+A message may be one vehicle record, an array of records, or an object with a `vehicles` array. Example record:
 
 ```json
 {
@@ -51,16 +102,17 @@ Each message can be one vehicle record, an array of records, or an object with a
 }
 ```
 
-Only finite, in-range GPS coordinates are accepted. Capacity and occupancy are bounded and normalised client-side; production validation and authentication should also happen on the server.
+Coordinates are validated client-side. Production deployments also need authenticated drivers/devices, server-side validation, telemetry freshness handling, privacy controls and secure backend fan-out.
 
 ## Main files
 
-- `index.html` — app shell, map container, map controls, search and bottom-sheet UI.
-- `styles.css` — visual design, mobile layout and sheet drag surfaces.
-- `script.js` — sample routes and shuttles, route/ETA calculations, animation, map layers, search, alerts and optional WebSocket feed.
-- `campus-fallback.svg` — bundled schematic map used if Leaflet or online map assets cannot load.
-- `service-worker.js` — application-shell cache and offline navigation fallback.
+- `index.html` — app shell, map container, controls, route planner and swipeable sheet.
+- `styles.css` — visual design, responsive layout, markers and sheet drag surfaces.
+- `script.js` — stops, directional service patterns, sample shuttle fleet, route/ETA calculations, map layers, animation, search, alerts and optional WebSocket feed.
+- `campus-fallback.svg` — bundled schematic used if Leaflet or online map assets cannot load.
+- `service-worker.js` — app-shell cache and offline navigation fallback.
+- `README.md` — setup instructions and data-confidence notes.
 
 ## Before a real launch
 
-Use an owned/contracted tile and routing service at the expected scale, add a secure backend for authenticated driver updates, and replace sample fleet metadata with verified data. Configure a suitable privacy notice before requesting precise location, and test mobile gestures on both Android and iOS devices.
+Confirm every stop's boarding-bay coordinates and every service's outbound/return sequence with the KNUST Transport Office or shuttle operators. Record terminal turnaround rules and stop dwell times, test ETAs against actual trips, then replace the demo fleet with authorised vehicle telemetry. Use a stable, suitably licensed tile/routing service for expected traffic, protect the telemetry backend and publish a privacy notice before requesting location.

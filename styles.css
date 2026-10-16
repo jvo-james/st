@@ -56,7 +56,7 @@ button:disabled { opacity: .48; cursor: not-allowed; }
 .map-layout { position: relative; z-index: 1; flex: 1 1 auto; min-height: 0; overflow: hidden; background: #e8f0e9; isolation: isolate; }
 #map, .local-map-fallback { position: absolute; inset: 0; width: 100%; height: 100%; background: #e8f0e9; }
 .leaflet-container { font: inherit; background: #e8f0e9; outline: 0; }
-.leaflet-tile-pane { filter: saturate(.84) contrast(1.015) brightness(1.02); }
+.leaflet-tile-pane { filter: none; }
 .leaflet-control-attribution { margin: 0 8px 8px 0 !important; padding: 3px 6px !important; border-radius: 6px !important; background: rgba(255,255,255,.78) !important; color: #718279 !important; font-size: 8px !important; box-shadow: 0 1px 5px rgba(31,61,43,.06); }
 .leaflet-control-attribution a { color: #386e57 !important; }
 .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow, .leaflet-tile-container, .leaflet-pane > svg, .leaflet-pane > canvas, .leaflet-zoom-box, .leaflet-image-layer, .leaflet-layer { position: absolute; left: 0; top: 0; }
@@ -66,7 +66,7 @@ button:disabled { opacity: .48; cursor: not-allowed; }
 .map-controls button { width: 39px; height: 39px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 11px; background: transparent; color: #295541; transition: background .18s, color .18s; }
 .map-controls button:hover, .map-controls button.is-active { color: var(--green-deep); background: #eaf6ef; }
 .map-controls svg { width: 19px; height: 19px; }
-#zoomIn, #zoomOut { display: none; }
+#zoomIn, #zoomOut { display: grid; }
 .map-scale-note { position: absolute; z-index: 500; right: 15px; bottom: 15px; display: flex; align-items: center; gap: 7px; max-width: calc(100% - 30px); padding: 7px 10px; border: 1px solid rgba(225,233,225,.9); border-radius: 10px; background: rgba(255,255,255,.9); box-shadow: 0 4px 16px rgba(30,53,37,.08); color: #63766a; font-size: 9px; font-weight: 700; backdrop-filter: blur(12px); pointer-events: none; }
 .tiny-live-dot, .summary-live-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #27b67e; box-shadow: 0 0 0 3px rgba(39,182,126,.12); }
 .note-separator { color: #c0c9c1; }
@@ -130,6 +130,23 @@ button:disabled { opacity: .48; cursor: not-allowed; }
 .sheet-section-heading h3, .timeline-heading h3 { margin: 4px 0 0; font-size: 15px; font-weight: 850; letter-spacing: -.035em; }
 .text-action { border: 0; padding: 4px 1px; background: transparent; color: var(--green); font-size: 10px; font-weight: 800; white-space: nowrap; }
 .text-action span { padding-left: 3px; }
+
+/* Direction-aware pickup and destination planner. */
+.trip-planner { margin: 0 0 18px; padding: 14px; border: 1px solid #e1ece3; border-radius: 16px; background: linear-gradient(180deg,#fbfefb 0%,#f4faf5 100%); }
+.trip-planner-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 12px; }
+.trip-planner-heading h3 { margin: 4px 0 0; color: var(--ink); font-size: 15px; font-weight: 850; letter-spacing: -.035em; }
+.trip-planner-route-icon { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px; background: #e5f5e9; color: var(--green); font-size: 19px; font-weight: 900; }
+.trip-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+.trip-fields label { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.trip-fields label > span { color: #72857a; font-size: 9px; font-weight: 800; }
+.trip-fields select { width: 100%; min-width: 0; height: 39px; padding: 0 8px; border: 1px solid #dce8df; border-radius: 10px; outline: none; background: #fff; color: #294b3a; font: inherit; font-size: 10px; font-weight: 750; }
+.trip-fields select:focus-visible { border-color: #70b793; box-shadow: 0 0 0 3px rgba(32,185,130,.13); }
+.trip-plan-button { min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 10px; padding: 10px 12px; font-size: 11px; }
+.trip-plan-button span { font-size: 16px; line-height: 1; }
+.trip-plan-note { margin: 9px 1px 0; color: #7a8e81; font-size: 9px; line-height: 1.45; }
+.trip-empty { border: 1px dashed #d9e7dc; border-radius: 12px; background: #fbfefb; line-height: 1.55; }
+@media (max-width: 420px) { .trip-fields { grid-template-columns: 1fr; } .trip-fields select { height: 42px; } }
+
 .home-bus-list { display: flex; flex-direction: column; gap: 7px; }
 .home-bus-card { width: 100%; min-height: 60px; display: flex; align-items: center; gap: 10px; padding: 9px 11px; border: 1px solid #e8eee8; border-radius: 13px; background: white; text-align: left; transition: border-color .18s, background .18s, transform .18s; }
 .home-bus-card:hover { border-color: #b9dac5; background: #fbfefb; }
@@ -239,14 +256,16 @@ button:disabled { opacity: .48; cursor: not-allowed; }
 
 /* Directional vehicle, route casing, blue location dot and ETA callout. */
 .bus-marker-shell, .bus-marker-shell.leaflet-div-icon { border: 0 !important; background: transparent !important; box-shadow: none !important; }
-.bus-marker { position: relative; width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 2px 2px rgba(18,50,33,.24)); transition: filter .15s; }
+.bus-marker { position: relative; width: 100%; height: 100%; display: block; overflow: visible; transform: translateZ(0); }
 .bus-vehicle { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transform: rotate(var(--heading,0deg)); transform-origin: 50% 50%; }
-.bus-marker::after { content: ""; position: absolute; inset: 0; border: 2px solid transparent; border-radius: 13px; pointer-events: none; }
-.bus-marker.is-selected { filter: drop-shadow(0 3px 4px rgba(19,49,32,.34)); }
-.bus-marker.is-selected::after { border-color: rgba(255,255,255,.82); }
+.bus-marker.is-selected { filter: none; }
 .bus-marker .bus-vehicle svg { width: 100%; height: 100%; display: block; overflow: visible; }
-.bus-marker .bus-label { position: absolute; z-index: 3; left: 50%; top: -20px; transform: translateX(-50%); display: none; min-width: 43px; padding: 4px 6px; border: 1px solid #e4ebe4; border-radius: 6px; background: white; color: var(--ink); font-size: 8px; font-weight: 900; text-align: center; white-space: nowrap; box-shadow: 0 2px 8px rgba(20,42,28,.12); }
+.bus-marker .bus-label { position: absolute; z-index: 4; left: 50%; top: -22px; transform: translateX(-50%); display: none; min-width: 43px; padding: 4px 6px; border: 1px solid #e4ebe4; border-radius: 6px; background: white; color: var(--ink); font-size: 8px; font-weight: 900; text-align: center; white-space: nowrap; box-shadow: 0 2px 8px rgba(20,42,28,.12); }
 .bus-marker.is-selected .bus-label { display: block; }
+.bus-marker .bus-id-label { position: absolute; z-index: 3; left: 50%; bottom: -8px; transform: translateX(-50%); display: block; padding: 2px 4px; border-radius: 5px; background: rgba(255,255,255,.94); color: #285343; font-size: 8px; font-weight: 900; line-height: 1.2; letter-spacing: -.02em; box-shadow: 0 1px 4px rgba(18,50,33,.13); pointer-events: none; }
+.bus-marker.is-selected .bus-id-label { display: none; }
+.bus-marker-shell { will-change: transform; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+.bus-marker .bus-vehicle { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .approach-route-outline { filter: drop-shadow(0 1px 1px rgba(255,255,255,.38)); }
 .approach-route-line { filter: drop-shadow(0 1px 1px rgba(18,101,70,.14)); }
 .route-line { filter: none; }
