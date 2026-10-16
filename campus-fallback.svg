@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 950" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edf3e8"/><stop offset="1" stop-color="#e4ecdd"/></linearGradient>
+    <pattern id="fineGrid" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="4" cy="5" r="1.1" fill="#d4e0d0" opacity=".7"/></pattern>
+    <pattern id="blocks" width="58" height="48" patternUnits="userSpaceOnUse"><rect x="8" y="8" width="23" height="13" rx="2" fill="#d7dcca" opacity=".78"/><rect x="36" y="26" width="15" height="11" rx="2" fill="#d7dcca" opacity=".65"/></pattern>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="14"/></filter>
+    <style>
+      .road-outer{fill:none;stroke:#fff;stroke-width:29;stroke-linecap:round;stroke-linejoin:round}
+      .road-inner{fill:none;stroke:#c7d1c4;stroke-width:18;stroke-linecap:round;stroke-linejoin:round}
+      .small-road-outer{fill:none;stroke:#fff;stroke-width:16;stroke-linecap:round;stroke-linejoin:round}
+      .small-road-inner{fill:none;stroke:#d0d8cc;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+      .label{font-family:Inter,Arial,sans-serif;font-size:17px;font-weight:700;fill:#788b7b;letter-spacing:.2px}
+      .micro{font-family:Inter,Arial,sans-serif;font-size:12px;font-weight:700;fill:#91a090;letter-spacing:1.7px}
+    </style>
+  </defs>
+  <rect width="1200" height="950" fill="url(#land)"/>
+  <rect width="1200" height="950" fill="url(#fineGrid)"/>
+  <path d="M-30 70C170 30 260 100 370 79S604 23 762 79 1019 54 1240 18L1240 241C1025 295 900 239 755 258S474 213 340 267 74 249-25 280Z" fill="#d6e6c9" opacity=".8"/>
+  <path d="M-20 515C155 465 252 498 378 475S610 516 750 468 1020 491 1220 444L1220 660C1040 714 900 657 758 684S480 633 338 685 74 651-20 709Z" fill="#d8e7ce" opacity=".78"/>
+  <path d="M40 360C185 293 304 329 390 277S570 290 676 250 883 281 1044 218 1150 234 1230 196" fill="none" stroke="#cbdcbd" stroke-width="75" opacity=".35" filter="url(#soft)"/>
+  <path d="M30 115H1170V840H30Z" fill="url(#blocks)" opacity=".45"/>
+  <!-- major mapped corridors -->
+  <path class="road-outer" d="M-20 427 92 414 176 396 226 376 257 326 305 361 346 405 356 436 365 529 424 572 484 447 587 459 697 475 815 469 916 454 1023 455 1220 427"/>
+  <path class="road-inner" d="M-20 427 92 414 176 396 226 376 257 326 305 361 346 405 356 436 365 529 424 572 484 447 587 459 697 475 815 469 916 454 1023 455 1220 427"/>
+  <path class="road-outer" d="M52 258 125 278 183 280 257 326 305 361 330 300 396 304 433 304 511 342 596 339 674 352 735 323 823 309 904 284 1020 268 1210 236"/>
+  <path class="road-inner" d="M52 258 125 278 183 280 257 326 305 361 330 300 396 304 433 304 511 342 596 339 674 352 735 323 823 309 904 284 1020 268 1210 236"/>
+  <path class="road-outer" d="M222 376 224 434 222 491 221 563 248 632 309 688 379 734 453 758 561 765 673 748 776 768 890 788 1012 795 1200 770"/>
+  <path class="road-inner" d="M222 376 224 434 222 491 221 563 248 632 309 688 379 734 453 758 561 765 673 748 776 768 890 788 1012 795 1200 770"/>
+  <path class="road-outer" d="M183 280 188 350 224 376 305 361 405 404 484 447 525 518 561 590 561 765"/>
+  <path class="road-inner" d="M183 280 188 350 224 376 305 361 405 404 484 447 525 518 561 590 561 765"/>
+  <path class="road-outer" d="M365 529 425 495 484 447 538 403 596 339 655 276 735 240 814 212 887 182 972 148 1082 117 1215 103"/>
+  <path class="road-inner" d="M365 529 425 495 484 447 538 403 596 339 655 276 735 240 814 212 887 182 972 148 1082 117 1215 103"/>
+  <!-- smaller campus access roads -->
+  <path class="small-road-outer" d="M80 310 140 329 188 350 257 326 301 270 345 229 415 208 496 204 574 222"/><path class="small-road-inner" d="M80 310 140 329 188 350 257 326 301 270 345 229 415 208 496 204 574 222"/>
+  <path class="small-road-outer" d="M301 270 330 300 346 405 356 436 308 463 278 507 221 563"/><path class="small-road-inner" d="M301 270 330 300 346 405 356 436 308 463 278 507 221 563"/>
+  <path class="small-road-outer" d="M433 304 420 370 405 404 425 495 424 572 453 647 561 765"/><path class="small-road-inner" d="M433 304 420 370 405 404 425 495 424 572 453 647 561 765"/>
+  <path class="small-road-outer" d="M596 339 612 410 587 459 645 522 724 558 800 586 892 573 982 579 1100 557 1220 559"/><path class="small-road-inner" d="M596 339 612 410 587 459 645 522 724 558 800 586 892 573 982 579 1100 557 1220 559"/>
+  <path class="small-road-outer" d="M735 323 720 379 697 475 724 558 776 650 776 768"/><path class="small-road-inner" d="M735 323 720 379 697 475 724 558 776 650 776 768"/>
+  <path class="small-road-outer" d="M823 309 815 380 815 469 892 573 890 788"/><path class="small-road-inner" d="M823 309 815 380 815 469 892 573 890 788"/>
+  <path class="small-road-outer" d="M1023 455 1050 512 1100 557 1108 638 1012 795"/><path class="small-road-inner" d="M1023 455 1050 512 1100 557 1108 638 1012 795"/>
+  <!-- pocket green spaces -->
+  <g fill="#b8d5a7" opacity=".75"><ellipse cx="375" cy="302" rx="70" ry="33"/><ellipse cx="658" cy="380" rx="45" ry="37"/><ellipse cx="284" cy="629" rx="61" ry="29"/><ellipse cx="918" cy="363" rx="54" ry="28"/><ellipse cx="1026" cy="665" rx="70" ry="32"/><ellipse cx="557" cy="694" rx="40" ry="32"/></g>
+  <g fill="#91bd80" opacity=".45"><circle cx="347" cy="297" r="8"/><circle cx="365" cy="287" r="9"/><circle cx="389" cy="305" r="8"/><circle cx="650" cy="375" r="8"/><circle cx="668" cy="388" r="9"/><circle cx="279" cy="622" r="8"/><circle cx="298" cy="637" r="8"/><circle cx="915" cy="357" r="8"/><circle cx="932" cy="369" r="8"/></g>
+  <g class="micro"><text x="65" y="82">KNUST CAMPUS</text><text x="845" y="885">KUMASI · GHANA</text></g>
+  <g class="label"><text x="96" y="237">Commercial Area</text><text x="142" y="304">Jubilee Mall</text><text x="277" y="307">Great Hall</text><text x="315" y="391">Conti</text><text x="258" y="414">Republic Hall</text><text x="238" y="585">Brunei Complex</text><text x="378" y="551">Science &amp; Engineering</text><text x="493" y="434">Ayeduase Gate</text><text x="528" y="798">Kotei</text><text x="960" y="432">Boadi Market</text><text x="350" y="459">Trinity</text></g>
+</svg>

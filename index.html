@@ -1,126 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#082f2c" />
-  <meta name="description" content="A responsive campus shuttle map for Kwame Nkrumah University of Science and Technology, Kumasi." />
-  <title>KNUST Shuttle — Campus transit</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link rel="preconnect" href="https://a.basemaps.cartocdn.com" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8f4">
+  <meta name="description" content="Find KNUST campus shuttles, checkpoints and estimated arrivals in Kumasi, Ghana.">
+  <title>KNUST Shuttle — Campus mobility</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
+  <link rel="preconnect" href="https://router.project-osrm.org" crossorigin>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="#top" aria-label="KNUST Shuttle home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 44 44" fill="none"><rect x="5" y="8" width="34" height="25" rx="7" fill="currentColor" opacity=".17"/><path d="M12 25V15.5c0-2 1.5-3.5 3.5-3.5h13c2 0 3.5 1.5 3.5 3.5V25H12Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M12 20h20M17 12v8m10-8v8M15 25v3m18-3v3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="29" r="2.5" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="28" cy="29" r="2.5" fill="#fff" stroke="currentColor" stroke-width="2"/></svg>
+  <div class="app-frame">
+    <header class="app-header">
+      <a class="brand" href="#" aria-label="KNUST Shuttle home">
+        <span class="brand-symbol" aria-hidden="true">
+          <svg viewBox="0 0 44 44" fill="none"><path d="M8 12.5C8 10.57 9.57 9 11.5 9h21c1.93 0 3.5 1.57 3.5 3.5v17a3.5 3.5 0 0 1-3.5 3.5h-21A3.5 3.5 0 0 1 8 29.5v-17Z" fill="currentColor"/><path d="M12 14h21v9H12z" fill="#17382F"/><path d="M12 26h21M15 30v2m15-2v2" stroke="#17382F" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="30" r="2.4" fill="#C8F36A"/><circle cx="30" cy="30" r="2.4" fill="#C8F36A"/></svg>
         </span>
-        <span class="brand-copy"><strong>KNUST <span>SHUTTLE</span></strong><small>CAMPUS TRANSIT, MADE SIMPLE</small></span>
+        <span class="brand-lockup"><strong>KNUST <span>SHUTTLE</span></strong><small>CAMPUS MOBILITY</small></span>
       </a>
-      <div class="topbar-right">
-        <div class="campus-chip"><span class="campus-dot"></span><span>Kumasi, Ghana</span></div>
-        <div class="feed-chip"><span class="feed-pulse"></span><span>DEMO FEED</span></div>
-        <button id="mobilePanelToggle" class="icon-button mobile-panel-toggle" aria-label="Open shuttle panel" title="Shuttle panel"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <div class="header-center"><span class="campus-mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg></span><span><b>KNUST Campus</b><small>Kumasi, Ashanti Region</small></span></div>
+      <div class="header-actions">
+        <button class="header-location" id="locateTop" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.4" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Find me</span></button>
+        <button class="avatar-button" id="helpButton" type="button" aria-label="Help and information" title="Help"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.8 9a2.3 2.3 0 1 1 3.8 1.7c-1 .8-1.6 1.1-1.6 2.3m0 3h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
       </div>
     </header>
 
-    <main class="workspace" id="top">
-      <aside class="sidebar" id="sidebar" aria-label="Shuttle information panel">
-        <div class="sidebar-head">
-          <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CAMPUS, CONNECTED</div>
-          <h1>Move around<br /><span>with confidence.</span></h1>
-          <p class="intro-copy">Find campus shuttles, explore stops, and plan your next ride around KNUST.</p>
-          <div class="summary-stats">
-            <div class="stat-card"><span class="stat-icon bus-stat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 17V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5V17M5 11h14M7.5 17v2m9-2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="16" r="1.3" fill="currentColor"/><circle cx="16" cy="16" r="1.3" fill="currentColor"/></svg></span><span class="stat-number" id="activeBusCount">04</span><span class="stat-label">Shuttles moving</span></div>
-            <div class="stat-card"><span class="stat-icon stop-stat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.2" stroke="currentColor" stroke-width="1.8"/></svg></span><span class="stat-number" id="stopCount">08</span><span class="stat-label">Mapped stops</span></div>
-            <div class="stat-card"><span class="stat-icon route-stat-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.3" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18" r="2.3" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 6H13a3 3 0 0 1 3 3v6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="stat-number" id="routeCount">03</span><span class="stat-label">Campus routes</span></div>
+    <nav class="route-rail" aria-label="Filter by shuttle route">
+      <div class="route-rail-label">ROUTES</div>
+      <div class="route-chips" id="routeChips">
+        <button type="button" class="route-chip is-active" data-route="all" aria-pressed="true"><span class="route-chip-dot all-dot"></span>All shuttles</button>
+        <button type="button" class="route-chip" data-route="ayeduase" aria-pressed="false"><span class="route-chip-dot" style="--route:#4778f5"></span>Ayeduase Route</button>
+        <button type="button" class="route-chip" data-route="kotei" aria-pressed="false"><span class="route-chip-dot" style="--route:#ed9347"></span>Kotei Route</button>
+        <button type="button" class="route-chip" data-route="halls" aria-pressed="false"><span class="route-chip-dot" style="--route:#168467"></span>Brunei / Halls Route</button>
+        <button type="button" class="route-chip" data-route="academic" aria-pressed="false"><span class="route-chip-dot" style="--route:#9a6de1"></span>Academic Loop</button>
+      </div>
+      <button class="route-search-button" id="searchToggle" type="button" aria-label="Search checkpoints and shuttles"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </nav>
+
+    <main class="map-layout">
+      <div id="map" role="application" aria-label="Interactive KNUST campus map"></div>
+      <div id="localMapFallback" class="local-map-fallback" hidden aria-label="Local campus map fallback"></div>
+      <div class="map-top-left">
+        <div class="map-caption"><span class="map-caption-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 10 9-6 9 6M5.5 10.5v8m4-8v8m5-8v8m4-8v8M3.5 20h17M2.5 10.5h19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Explore campus</b><small>Shuttles, checkpoints & places</small></span></div>
+      </div>
+      <div class="map-top-right">
+        <button class="map-icon-button" id="routeLayerToggle" type="button" aria-pressed="true" title="Show or hide routes" aria-label="Show or hide routes"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="2.3" stroke="currentColor" stroke-width="1.7"/><circle cx="18" cy="18" r="2.3" stroke="currentColor" stroke-width="1.7"/><path d="M8.5 6h3a3.5 3.5 0 0 1 3.5 3.5V15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Routes</span></button>
+        <button class="map-icon-button" id="mapStyleToggle" type="button" aria-pressed="false" title="Change map style" aria-label="Change map style"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>Satellite</span></button>
+      </div>
+      <div class="map-controls" aria-label="Map controls">
+        <button id="locateButton" type="button" title="Find my location" aria-label="Find my location"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.3" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        <button id="zoomIn" type="button" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+        <button id="zoomOut" type="button" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></button>
+        <button id="fitCampus" type="button" title="View all checkpoints" aria-label="View all checkpoints"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="map-scale-note"><span class="tiny-live-dot"></span><span id="mapActivity">4 shuttles on the move</span><span class="note-separator">·</span><span id="lastUpdate">Updated just now</span></div>
+      <div class="map-attribution-float" id="mapAttribution">Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> · © <a href="https://carto.com/attributions/" target="_blank" rel="noopener">CARTO</a></div>
+
+      <div class="search-panel" id="searchPanel" hidden>
+        <div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="globalSearch" type="search" placeholder="Find a shuttle or checkpoint" autocomplete="off"><button id="searchClose" type="button" aria-label="Close search">×</button></div>
+        <div id="searchResults" class="search-results"></div>
+      </div>
+
+      <section class="bottom-sheet" id="bottomSheet" aria-label="Nearby shuttles and checkpoint details">
+        <div class="sheet-grab-area"><button id="sheetHandle" class="sheet-handle" type="button" aria-label="Expand nearby shuttle panel" aria-expanded="false"><span></span></button></div>
+        <div class="sheet-home" id="sheetHome">
+          <div class="nearest-row">
+            <div class="nearest-copy"><div class="section-kicker"><span class="kicker-line"></span> NEAREST CHECKPOINT</div><h2 id="nearestStopName">Finding your nearest stop</h2><p id="nearestDistance">Enable location to personalise your arrivals</p></div>
+            <div class="nearest-eta"><strong id="nearestEta">—</strong><span>min away</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+          <div class="next-arrival-line"><span class="arrival-route-swatch" id="nearestRouteSwatch"></span><p id="nearestMessage">Find a shuttle heading to your next stop.</p><button id="nearestBell" class="tiny-bell" type="button" aria-label="Notify me about this checkpoint" title="Notify me about this checkpoint"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <div class="sheet-expanded-content" id="homeExpandedContent">
+            <div class="sheet-section-heading"><div><span class="section-kicker">ON THE MOVE</span><h3>Nearby shuttles</h3></div><button id="viewAllBuses" class="text-action" type="button">View all <span>↗</span></button></div>
+            <div id="homeBusList" class="home-bus-list"></div>
+            <div class="sheet-section-heading checkpoints-heading"><div><span class="section-kicker">AROUND KNUST</span><h3>Popular checkpoints</h3></div></div>
+            <div id="quickCheckpoints" class="quick-checkpoints"></div>
           </div>
         </div>
-
-        <div class="panel-tools">
-          <label class="search-box" for="globalSearch"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="globalSearch" type="search" placeholder="Search shuttles, stops, landmarks…" autocomplete="off" /><kbd>/</kbd></label>
-          <div class="tab-row" role="tablist" aria-label="Browse map items">
-            <button class="tab-button active" id="shuttlesTab" data-tab="shuttles" role="tab" aria-selected="true"><span>Shuttles</span><span class="tab-count" id="shuttlesTabCount">04</span></button>
-            <button class="tab-button" id="stopsTab" data-tab="stops" role="tab" aria-selected="false"><span>Stops & places</span><span class="tab-count" id="stopsTabCount">08</span></button>
+        <div class="sheet-detail" id="sheetDetail" hidden>
+          <div class="detail-header"><button id="detailBack" class="back-button" type="button" aria-label="Back to nearby shuttles"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="detail-heading"><span class="section-kicker" id="detailEyebrow">SHUTTLE DETAILS</span><h2 id="detailTitle">Shuttle K-01</h2><p id="detailSubtitle">Brunei / Halls · Academic Core</p></div><button id="detailBell" class="detail-bell" type="button" aria-label="Set checkpoint alert" title="Set checkpoint alert"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+          <div id="busDetailView" class="bus-detail-view">
+            <div class="bus-identity-row"><div class="bus-identity-icon" id="detailBusIcon"></div><div class="bus-identity-copy"><strong id="detailBusName">Shuttle K-01</strong><span id="detailBusPlate">AS 2145–24</span></div><span id="seatStatus" class="seat-status"><i></i><span>Seats available</span></span></div>
+            <div class="occupancy-card"><div class="occupancy-top"><span>Passenger occupancy</span><strong id="occupancyLabel">8 of 18 seats</strong></div><div class="occupancy-track"><span id="occupancyFill"></span></div><div class="occupancy-foot"><span id="occupancyFootText">10 seats available</span><span id="occupancyPercent">44% full</span></div></div>
+            <div class="driver-card"><div class="driver-avatar" id="driverInitials">KA</div><div class="driver-copy"><span>DRIVER</span><strong id="driverName">Kwame A.</strong><small>Assigned shuttle driver</small></div><div class="vehicle-plate" id="vehiclePlate">AS 2145–24</div></div>
+            <div class="timeline-heading"><div><span class="section-kicker">UPCOMING</span><h3>Checkpoint timeline</h3></div><span class="route-mini-dot" id="detailRouteDot"></span></div>
+            <div class="checkpoint-timeline" id="checkpointTimeline"></div>
+            <div class="detail-footer"><span class="estimated-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Arrival estimates update as the shuttle moves</span><button id="centerSelected" class="primary-action" type="button">Follow shuttle <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
           </div>
-        </div>
-
-        <section class="content-list" id="contentList" aria-live="polite" aria-label="Map items"></section>
-        <div class="sidebar-footer">
-          <div class="footer-note-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 11v5m0-8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-          <div><strong>Demo tracking mode</strong><p>Vehicle movement is simulated. Live tracking needs a connected shuttle GPS feed.</p></div>
-        </div>
-      </aside>
-
-      <section class="map-stage" aria-label="Interactive KNUST campus map">
-        <div id="map" role="application" aria-label="Map of KNUST campus with shuttle locations"></div>
-        <div class="map-vignette" aria-hidden="true"></div>
-        <div class="map-topline">
-          <div class="map-location-card"><span class="map-location-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.7 7-12a7 7 0 0 0-14 0c0 6.3 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg></span><div><strong>KNUST Campus</strong><small>Kwame Nkrumah University of Science and Technology</small></div><span class="map-location-chevron"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
-          <div class="map-actions"><button id="routeToggle" class="map-pill-button is-on" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5h5v5H5zM14 14h5v5h-5zM10 7.5h2.5a3 3 0 0 1 3 3V14" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg><span>Routes</span></button><button id="layerToggle" class="map-pill-button"><svg viewBox="0 0 24 24" fill="none"><path d="m12 3 9 5-9 5-9-5 9-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>Satellite</span></button></div>
-        </div>
-
-        <div class="map-side-controls">
-          <button id="locateButton" class="map-control locate-control" title="Find my current location" aria-label="Find my current location"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.2" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <button id="followButton" class="map-control" title="Follow my location" aria-label="Follow my location" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.7 7-12a7 7 0 0 0-14 0c0 6.3 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg></button>
-          <span class="control-separator"></span>
-          <button id="zoomInButton" class="map-control" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button id="zoomOutButton" class="map-control" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-        </div>
-
-        <div class="map-bottom-left"><div class="map-legend"><span class="legend-item"><i class="legend-bus"></i> Shuttle</span><span class="legend-item"><i class="legend-stop"></i> Stop</span><span class="legend-item"><i class="legend-landmark"></i> Landmark</span><span class="legend-item"><i class="legend-user"></i> You</span></div><div class="map-attribution-note">Map data © OpenStreetMap contributors · CARTO</div></div>
-        <div class="map-bottom-right"><div class="map-clock"><span class="clock-dot"></span><span id="clockTime">LOCAL TIME</span><span class="clock-divider"></span><span id="mapStatus">4 vehicles active</span></div><button id="fitMapButton" class="fit-map-button"><svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>View campus</span></button></div>
-        <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-        <div class="selected-card" id="selectedCard" aria-live="polite">
-          <button class="selected-close" id="selectedClose" aria-label="Close shuttle details"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <div class="selected-card-top"><span class="selected-bus-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 17V6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5V17M5 11h14M7.5 17v2m9-2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="16" r="1.3" fill="currentColor"/><circle cx="16" cy="16" r="1.3" fill="currentColor"/></svg></span><div class="selected-title-wrap"><span class="selected-overline">SELECTED SHUTTLE</span><h2 id="selectedBusName">Shuttle K-01</h2></div><span class="moving-badge"><i></i> Moving</span></div>
-          <p class="selected-route-name" id="selectedRouteName">Halls ↔ Academic Core</p>
-          <div class="selected-metrics"><div><span>Next stop</span><strong id="selectedNextStop">Conti Roundabout</strong></div><div><span>ETA (demo)</span><strong id="selectedEta">3 min</strong></div><div><span>Passengers</span><strong id="selectedCapacity">12 / 18</strong></div></div>
-          <div class="selected-card-bottom"><span class="demo-estimate"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Indicative estimate</span><button id="centerSelectedButton">Center shuttle <span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
+          <div id="stopDetailView" class="stop-detail-view" hidden>
+            <div class="stop-highlight"><span class="stop-highlight-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg></span><div><strong id="stopDetailName">Conti Roundabout</strong><p id="stopDetailDescription">Shuttle checkpoint</p></div><button id="stopAlertButton" class="alert-action" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Alert me</span></button></div>
+            <div class="arrival-count-row"><div><strong id="stopArrivalCount">2 shuttles approaching</strong><span>Vehicles heading to this checkpoint</span></div><span class="arrival-count-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10M4 12h16M7 17v2m10-2v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="17" r="1.3" fill="currentColor"/><circle cx="16" cy="17" r="1.3" fill="currentColor"/></svg></span></div>
+            <div id="stopArrivalsList" class="stop-arrivals-list"></div>
+          </div>
         </div>
       </section>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </main>
   </div>
-  <div id="appError" class="app-error" hidden></div>
+  <div id="helpDialog" class="modal-backdrop" hidden><section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><button id="helpClose" class="dialog-close" type="button" aria-label="Close help">×</button><span class="section-kicker">KNUST SHUTTLE</span><h2 id="helpTitle">Your campus, connected.</h2><p>Explore shuttle routes, tap a vehicle for its checkpoint timeline, or select a checkpoint to see approaching shuttles. Allow location access to find the nearest stop. Use the bell to receive a reminder while this app is open.</p><div class="help-key"><span><i class="key-dot available"></i>Seats available</span><span><i class="key-dot full"></i>Full shuttle</span><span><i class="key-user"></i>Your location</span></div><button class="primary-action full-width" id="helpDone" type="button">Got it</button></section></div>
+  <div id="appNotice" class="app-notice" hidden></div>
+
   <script>
-    /* Try several fixed-version Leaflet CDNs. If all are unreachable, start the
-       bundled SVG campus map instead of leaving a blank map canvas. */
-    (function () {
-      var jsSources = [
-        'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js',
-        'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-      ];
-      var cssSources = [
-        'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
-        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css',
-        'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-      ];
-      function loadCss(i) {
-        if (i >= cssSources.length) return;
-        var link = document.createElement('link');
-        link.rel = 'stylesheet'; link.href = cssSources[i];
-        link.onerror = function () { link.remove(); loadCss(i + 1); };
-        document.head.appendChild(link);
-      }
-      function loadApp(src) {
-        loadCss(0);
-        var app = document.createElement('script'); app.src = src; document.body.appendChild(app);
-      }
-      function loadLeaflet(i) {
-        if (i >= jsSources.length) { loadApp('fallback.js'); return; }
-        var script = document.createElement('script'); script.src = jsSources[i];
-        var settled = false;
-        var deadline = setTimeout(function () { if (!settled) { settled = true; script.remove(); loadLeaflet(i + 1); } }, 1800);
-        script.onload = function () { if (settled) return; settled = true; clearTimeout(deadline); loadApp('script.js'); };
-        script.onerror = function () { if (settled) return; settled = true; clearTimeout(deadline); script.remove(); loadLeaflet(i + 1); };
-        document.head.appendChild(script);
-      }
-      loadLeaflet(0);
+    (function(){
+      const cssSources=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.css','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'];
+      const jsSources=['https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'];
+      function css(i){if(i>=cssSources.length)return;const l=document.createElement('link');l.rel='stylesheet';l.href=cssSources[i];l.onerror=()=>{l.remove();css(i+1)};document.head.appendChild(l)}
+      function js(i){if(i>=jsSources.length){const f=document.createElement('script');f.src='fallback.js';document.body.appendChild(f);return}const s=document.createElement('script');s.src=jsSources[i];let done=false;const t=setTimeout(()=>{if(!done){done=true;s.remove();js(i+1)}},2200);s.onload=()=>{if(done)return;done=true;clearTimeout(t);css(0);const app=document.createElement('script');app.src='script.js';document.body.appendChild(app)};s.onerror=()=>{if(done)return;done=true;clearTimeout(t);s.remove();js(i+1)};document.head.appendChild(s)}
+      js(0);
     })();
   </script>
 </body>
